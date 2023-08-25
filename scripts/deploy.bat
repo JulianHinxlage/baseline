@@ -1,6 +1,7 @@
 call build.bat
 
 cd ..
+rmdir /s /q deploy
 mkdir deploy
 cd build
 cd Release
