@@ -4,7 +4,7 @@ cd ..
 mkdir build
 cd build
 
-msbuild baseline.sln /p:Configuration=Debug
+msbuild Baseline.sln /p:Configuration=Debug
 
 cd ..
 cd scripts

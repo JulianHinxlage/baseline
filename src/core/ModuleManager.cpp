@@ -14,8 +14,10 @@
 
 #if WIN32
 	#define FILE_PATH_SEPERATOR "\\"
+	#define MODULE_FILE_EXTENSION ".dll"
 #else
 	#define FILE_PATH_SEPERATOR "/"
+	#define MODULE_FILE_EXTENSION ".so"
 #endif
 
 namespace baseline {
@@ -32,19 +34,13 @@ namespace baseline {
 		std::string baseFile = name;
 		std::string extension = std::filesystem::path(name).extension().string();
 
-#if WIN32
 		if (extension == "") {
-			baseFile += ".dll";
+			baseFile += MODULE_FILE_EXTENSION;
 		}
-#else
-		if (extension == "") {
-			baseFile += ".so";
-		}
-#endif
 
 		std::string file = "";
-		for (auto& direction : moduleDirectories) {
-			file = direction + FILE_PATH_SEPERATOR + baseFile;
+		for (auto& directory : moduleDirectories) {
+			file = directory + FILE_PATH_SEPERATOR + baseFile;
 			if (std::filesystem::exists(file)) {
 				break;
 			}
@@ -110,6 +106,35 @@ namespace baseline {
 				break;
 			}
 		}
+	}
+
+	std::vector<Module*> ModuleManager::getLoadedModules() {
+		std::vector<Module*> list;
+		for (auto& m : modules) {
+			list.push_back(m.get());
+		}
+		return list;
+	}
+
+	std::vector<std::string> ModuleManager::getInstalledModules() {
+		std::vector<std::string> list;
+
+		for (auto& directory : moduleDirectories) {
+			for (auto &file : std::filesystem::directory_iterator(directory)) {
+				if (file.is_regular_file()) {
+					if (file.path().extension() == MODULE_FILE_EXTENSION) {
+						list.push_back(std::filesystem::relative(file.path(), directory).stem().string());
+					}
+				}
+			}
+		}
+
+		return list;
+	}
+
+	ModuleManager* getModuleManager() {
+		static ModuleManager moduleManager;
+		return &moduleManager;
 	}
 
 }
