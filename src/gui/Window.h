@@ -7,12 +7,14 @@
 #include <string>
 #include <unordered_map>
 #include <memory>
+#include <functional>
 
 namespace baseline {
 
 	class Window {
 	public:
 		bool alwaysRefresh = false;
+		std::vector<std::function<void()>> updateCallbacks;
 
 		bool init(int width, int height, const std::string &title, int swapInterval = 1);
 		void beginFrame();

@@ -5,6 +5,7 @@
 #pragma once
 
 #include "Module.h"
+#include "Singleton.h"
 #include <vector>
 #include <memory>
 
@@ -12,8 +13,9 @@ namespace baseline {
 
 	class ModuleManager {
 	public:
-		ModuleManager();
+		bool enableHotReloading = false;
 
+		ModuleManager();
 		void addModuleDirectory(const std::string &directory);
 		Module *loadModule(const std::string &name);
 		Module* getModule(const std::string& name);
@@ -22,13 +24,9 @@ namespace baseline {
 		std::vector<Module*> getLoadedModules();
 		std::vector<std::string> getInstalledModules();
 
-
 	private:
 		std::vector<std::string> moduleDirectories;
 		std::vector<std::shared_ptr<Module>> modules;
 	};
 
-	ModuleManager* getModuleManager();
 }
-
-static baseline::ModuleManager *moduleManager = baseline::getModuleManager();

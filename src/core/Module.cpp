@@ -15,6 +15,7 @@ namespace baseline {
 	Module::Module() {
 		handle = nullptr;
 		name = "";
+		runtimeFile = "";
 	}
 
 	void Module::invoke(const std::string& function) {

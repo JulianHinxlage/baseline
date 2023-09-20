@@ -4,6 +4,8 @@
 
 #include "ModuleManager.h"
 #include "common/Log.h"
+#include "Singleton.h"
+#include "FileWatcher.h"
 #include <filesystem>
 
 #if WIN32
@@ -27,7 +29,13 @@ namespace baseline {
 	}
 
 	void ModuleManager::addModuleDirectory(const std::string& directory) {
-		moduleDirectories.push_back(std::filesystem::absolute(directory).string());
+		std::string absolut = std::filesystem::absolute(directory).string();
+		for (auto& directory : moduleDirectories) {
+			if (directory == absolut) {
+				return;
+			}
+		}
+		moduleDirectories.push_back(absolut);
 	}
 
 	Module* ModuleManager::loadModule(const std::string& name) {
@@ -52,12 +60,37 @@ namespace baseline {
 			return nullptr;
 		}
 
+		for (auto& module : modules) {
+			if (module->file == file) {
+				Log::warning("module %s: already loaded\n", name.c_str());
+				return module.get();
+			}
+		}
+
 		auto module = std::make_shared<Module>();
 		module->name = name;
 		module->file = file;
+		module->runtimeFile = file;
+
+		if (enableHotReloading) {
+			for (int i = 0; i < 10; i++) {
+				std::filesystem::path path(file);
+				path = path.parent_path() / "runtime_files" / std::to_string(i) / path.filename();
+
+				if (!std::filesystem::exists(path.parent_path())) {
+					std::filesystem::create_directories(path.parent_path());
+				}
+				try {
+					std::filesystem::copy(file, path, std::filesystem::copy_options::overwrite_existing);
+					module->runtimeFile = path.string();
+					break;
+				}
+				catch (...) {}
+			}
+		}
 
 #if WIN32
-		module->handle = (void*)LoadLibrary(file.c_str());
+		module->handle = (void*)LoadLibrary(module->runtimeFile.c_str());
 		if (!module->handle) {
 			Log::error("module %s could not be loaded\n", name.c_str());
 		}
@@ -65,11 +98,23 @@ namespace baseline {
 		module->handle = dlopen(runtimePath.c_str(), RTLD_NOW | RTLD_LOCAL);
 #endif
 
+		if (enableHotReloading) {
+			Singleton::get<FileWatcher>()->addFile(module->file, [&, name = module->name]() {
+				enableHotReloading = false;
+				unloadModule(name);
+				enableHotReloading = true;
+				loadModule(name);
+			});
+		}
+
 		if (module->handle) {
 			Log::info("module %s loaded, file: %s\n", name.c_str(), file.c_str());
 		}
 
 		modules.push_back(module);
+		if (module) {
+			module->invoke("load");
+		}
 		return module.get();
 	}
 
@@ -83,6 +128,9 @@ namespace baseline {
 	}
 
 	void ModuleManager::unloadModule(Module* module) {
+		if (module) {
+			module->invoke("unload");
+		}
 #ifdef WIN32
 		FreeLibrary((HINSTANCE)module->handle);
 #else      
@@ -90,6 +138,10 @@ namespace baseline {
 #endif
 		module->handle = nullptr;
 		Log::info("module %s unloaded\n", module->name.c_str());
+
+		if (enableHotReloading) {
+			Singleton::get<FileWatcher>()->removeFile(module->file);
+		}
 
 		for (int i = 0; i < modules.size(); i++) {
 			if (modules[i].get() == module) {
@@ -118,7 +170,6 @@ namespace baseline {
 
 	std::vector<std::string> ModuleManager::getInstalledModules() {
 		std::vector<std::string> list;
-
 		for (auto& directory : moduleDirectories) {
 			for (auto &file : std::filesystem::directory_iterator(directory)) {
 				if (file.is_regular_file()) {
@@ -128,13 +179,7 @@ namespace baseline {
 				}
 			}
 		}
-
 		return list;
-	}
-
-	ModuleManager* getModuleManager() {
-		static ModuleManager moduleManager;
-		return &moduleManager;
 	}
 
 }

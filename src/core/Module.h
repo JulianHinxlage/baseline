@@ -13,9 +13,9 @@ namespace baseline {
 	public:
 		std::string name;
 		std::string file;
+		std::string runtimeFile;
 
 		Module();
-
 		void invoke(const std::string& function);
 
 	private:
