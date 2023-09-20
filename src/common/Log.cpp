@@ -34,6 +34,7 @@ namespace baseline {
 		printf("[%s] ", time.toStringTime().c_str());
 		printf("[%s] ", logLevelName(level));
 		vprintf(fmt, args);
+		printf("\n");
 	}
 
 	void Log::log(LogLevel level, const char* fmt, ...) {

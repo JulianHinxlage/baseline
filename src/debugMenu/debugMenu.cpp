@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include "common/Log.h"
 #include "core/ModuleManager.h"
+#include "core/Config.h"
 #include "gui/Window.h"
 #include <imgui.h>
 #include <imgui/misc/cpp/imgui_stdlib.h>
@@ -24,9 +25,6 @@ void updateModulesWindow() {
 			for (auto& file : moduleManager->getInstalledModules()) {
 				if (ImGui::MenuItem(file.c_str())) {
 					auto *module = moduleManager->loadModule(file);
-					if (module) {
-						module->invoke("main");
-					}
 					ImGui::CloseCurrentPopup();
 				}
 			}
@@ -41,10 +39,6 @@ void updateModulesWindow() {
 						ImGui::TreePop();
 						break;
 					}
-					if (ImGui::Button("execute")) {
-						module->invoke("main");
-					}
-
 					ImGui::Text("file %s", module->file.c_str());
 					ImGui::TreePop();
 				}
@@ -55,22 +49,54 @@ void updateModulesWindow() {
 	}
 }
 
-int index = -1;
+void updateCommandsWindow() {
+	auto* window = Singleton::get<baseline::Window>();
+	if (window->beginWindow("commands")) {
+		auto* config = Singleton::get<Config>();
+		for(auto &command : config->getCommandList()){
+			if (ImGui::Button(command.c_str())) {
+				config->execute(command);
+			}
+		}
 
-extern "C" void unload() {
-	if (index != -1) {
-		auto* window = Singleton::get<baseline::Window>();
-		window->updateCallbacks.erase(window->updateCallbacks.begin() + index);
+		static std::string command;
+		ImGui::InputText("command", &command);
+		if (ImGui::Button("execute")) {
+			config->execute(command);
+		}
+
+		window->endWindow();
 	}
 }
 
-int main(int arc, char* argv[]) {
+void updateVarsWindow() {
 	auto* window = Singleton::get<baseline::Window>();
-	window->updateCallbacks.push_back([]() {
+	if (window->beginWindow("variables")) {
+		auto* config = Singleton::get<Config>();
+		for (auto& var : config->getVarList()) {
+			ImGui::Text("%s = %s", var.c_str(), config->getVar(var)->getString().c_str());
+		}
+		window->endWindow();
+	}
+}
+
+
+int id = -1;
+
+extern "C" void unload() {
+	if (id != -1) {
+		auto* window = Singleton::get<baseline::Window>();
+		window->removeUpdateCallback(id);
+	}
+}
+
+extern "C" void load() {
+	auto* window = Singleton::get<baseline::Window>();
+	id = window->addUpdateCallback([]() {
 		updateModulesWindow();
+		updateCommandsWindow();
+		updateVarsWindow();
 	});
-	index = window->updateCallbacks.size() - 1;
-	return 0;
 }
 
 

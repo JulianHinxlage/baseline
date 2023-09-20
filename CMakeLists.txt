@@ -80,9 +80,9 @@ include_directories(${PROJECT_NAME} PRIVATE src)
 target_link_libraries(${PROJECT_NAME} common gui)
 set_target_properties(${PROJECT_NAME} PROPERTIES FOLDER ${SOLUTION_NAME})
 
-### Module Debugger ##################
-project(moduleDebugger)
-file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS src/moduleDebugger/*.cpp src/moduleDebugger/*.h)
+### Debug Menu ##################
+project(debugMenu)
+file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS src/debugMenu/*.cpp src/debugMenu/*.h)
 add_library(${PROJECT_NAME} SHARED ${SOURCES})
 include_directories(${PROJECT_NAME} PRIVATE src)
 target_link_libraries(${PROJECT_NAME} core common gui)
@@ -94,7 +94,7 @@ file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS src/launch/*.cpp src/launch/*.h)
 add_executable(${PROJECT_NAME} ${SOURCES})
 include_directories(${PROJECT_NAME} PRIVATE src)
 target_link_libraries(${PROJECT_NAME} core)
-add_dependencies(${PROJECT_NAME} test network gui moduleDebugger)
+add_dependencies(${PROJECT_NAME} test network gui debugMenu)
 set_target_properties(${PROJECT_NAME} PROPERTIES FOLDER ${SOLUTION_NAME})
 set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT ${PROJECT_NAME})
 

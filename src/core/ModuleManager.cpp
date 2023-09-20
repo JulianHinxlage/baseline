@@ -6,6 +6,7 @@
 #include "common/Log.h"
 #include "Singleton.h"
 #include "FileWatcher.h"
+#include "Config.h"
 #include <filesystem>
 
 #if WIN32
@@ -25,7 +26,18 @@
 namespace baseline {
 
 	ModuleManager::ModuleManager() {
-		
+		auto* config = Singleton::get<Config>();
+		config->addVar("enableHotReloading", enableHotReloading);
+		config->addCommand("loadModule", [&](const std::vector<std::string>& args) {
+			if (args.size() > 0) {
+				loadModule(args[0]);
+			}
+		});
+		config->addCommand("unloadModule", [&](const std::vector<std::string>& args) {
+			if (args.size() > 0) {
+				unloadModule(args[0]);
+			}
+		});
 	}
 
 	void ModuleManager::addModuleDirectory(const std::string& directory) {
@@ -56,13 +68,13 @@ namespace baseline {
 		}
 
 		if (file == "") {
-			Log::warning("module %s: file not found\n", name.c_str());
+			Log::warning("module %s: file not found", name.c_str());
 			return nullptr;
 		}
 
 		for (auto& module : modules) {
 			if (module->file == file) {
-				Log::warning("module %s: already loaded\n", name.c_str());
+				Log::warning("module %s: already loaded", name.c_str());
 				return module.get();
 			}
 		}
@@ -92,7 +104,7 @@ namespace baseline {
 #if WIN32
 		module->handle = (void*)LoadLibrary(module->runtimeFile.c_str());
 		if (!module->handle) {
-			Log::error("module %s could not be loaded\n", name.c_str());
+			Log::error("module %s could not be loaded", name.c_str());
 		}
 #else
 		module->handle = dlopen(runtimePath.c_str(), RTLD_NOW | RTLD_LOCAL);
@@ -100,15 +112,16 @@ namespace baseline {
 
 		if (enableHotReloading) {
 			Singleton::get<FileWatcher>()->addFile(module->file, [&, name = module->name]() {
+				bool tmp = enableHotReloading;
 				enableHotReloading = false;
 				unloadModule(name);
-				enableHotReloading = true;
+				enableHotReloading = tmp;
 				loadModule(name);
 			});
 		}
 
 		if (module->handle) {
-			Log::info("module %s loaded, file: %s\n", name.c_str(), file.c_str());
+			Log::info("module %s loaded, file: %s", name.c_str(), file.c_str());
 		}
 
 		modules.push_back(module);
@@ -137,7 +150,7 @@ namespace baseline {
 		dlclose(module->handle);
 #endif
 		module->handle = nullptr;
-		Log::info("module %s unloaded\n", module->name.c_str());
+		Log::info("module %s unloaded", module->name.c_str());
 
 		if (enableHotReloading) {
 			Singleton::get<FileWatcher>()->removeFile(module->file);

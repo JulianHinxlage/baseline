@@ -19,13 +19,7 @@ int main(int arc, char* argv[]) {
 
 	while (window->isOpen()) {
 		window->beginFrame();
-
-		for (auto& callback : window->updateCallbacks) {
-			if (callback) {
-				callback();
-			}
-		}
-
+		window->invokeUpdateCallbacks();
 		window->endFrame();
 	}
 

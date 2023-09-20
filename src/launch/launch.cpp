@@ -4,6 +4,7 @@
 
 #include "core/ModuleManager.h"
 #include "core/FileWatcher.h"
+#include "core/Config.h"
 #include <filesystem>
 #include <thread>
 
@@ -16,6 +17,9 @@ public:
 		moduleManager->enableHotReloading = true;
 		moduleManager->addModuleDirectory(".");
 		moduleManager->addModuleDirectory(std::filesystem::path(argv[0]).parent_path().string());
+
+		auto* config = Singleton::get<Config>();
+		config->loadFirstFileFound({ "launch.cfg", "../launch.cfg" , "../../launch.cfg" });
 	}
 
 	void load(const std::string& name) {
@@ -60,8 +64,8 @@ int main(int argc, char* argv[]) {
 	auto* launcher = Singleton::get<Launcher>();
 	launcher->init(argc, argv);
 	launcher->run("gui", "main", true);
-	launcher->run("moduleDebugger", "main", false);
-	launcher->run("test", "main", false);
+	launcher->load("debugMenu");
+	launcher->load("test");
 	launcher->joinAll();
 	return 0;
 }

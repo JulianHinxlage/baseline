@@ -14,23 +14,23 @@ using namespace baseline;
 void updateTestWindow() {
 	auto* window = Singleton::get<baseline::Window>();
 	if (window->beginWindow("Test")) {
+		ImGui::Text("hello from Test");
 		window->endWindow();
 	}
 }
 
-int index = -1;
+int id = -1;
 
 extern "C" void unload() {
-	if (index != -1) {
+	if (id != -1) {
 		auto* window = Singleton::get<baseline::Window>();
-		window->updateCallbacks.erase(window->updateCallbacks.begin() + index);
+		window->removeUpdateCallback(id);
 	}
 }
 
 extern "C" void load() {
 	auto* window = Singleton::get<baseline::Window>();
-	window->updateCallbacks.push_back([]() {
+	id = window->addUpdateCallback([]() {
 		updateTestWindow();
 	});
-	index = window->updateCallbacks.size() - 1;
 }

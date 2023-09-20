@@ -189,6 +189,32 @@ namespace baseline {
 		glfwPostEmptyEvent();
 	}
 
+	int Window::addUpdateCallback(const std::function<void()>& callback) {
+		UpdateCallback update;
+		update.callback = callback;
+		update.id = nextUpdateCallbackId++;
+		updateCallbacks.push_back(update);
+		return update.id;
+	}
+
+	void Window::removeUpdateCallback(int id) {
+		for (int i = 0; i < updateCallbacks.size(); i++) {
+			if (updateCallbacks[i].id == id) {
+				updateCallbacks.erase(updateCallbacks.begin() + i);
+				break;
+			}
+		}
+	}
+
+	void Window::invokeUpdateCallbacks() {
+		for (int i = 0; i < updateCallbacks.size(); i++) {
+			auto& update = updateCallbacks[i];
+			if (update.callback) {
+				update.callback();
+			}
+		}
+	}
+
 	void Window::updateMenu() {
 		if (ImGui::BeginMainMenuBar()) {
 			if (subWindows.size() > 0) {
