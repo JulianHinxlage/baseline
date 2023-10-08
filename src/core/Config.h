@@ -63,12 +63,20 @@ namespace baseline {
 		}
 
 		template<typename T>
-		void addVar(const std::string& name, T& value) {
+		void addVar(const std::string& name, const T& value) {
 			VarT<T>* newVar = new VarT<T>();
-			newVar->value = &value;
+			newVar->data = value;
 			newVar->name = name;
 			vars.push_back(newVar);
 		}
+		template<typename T>
+		void addVar(const std::string& name, T* value) {
+			VarT<T>* newVar = new VarT<T>();
+			newVar->value = value;
+			newVar->name = name;
+			vars.push_back(newVar);
+		}
+
 		void addCommand(const std::string& name, const Callback& callback);
 		void execute(const std::string& string);
 

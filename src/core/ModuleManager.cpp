@@ -27,7 +27,7 @@ namespace baseline {
 
 	ModuleManager::ModuleManager() {
 		auto* config = Singleton::get<Config>();
-		config->addVar("enableHotReloading", enableHotReloading);
+		config->addVar("enableHotReloading", &enableHotReloading);
 		config->addCommand("loadModule", [&](const std::vector<std::string>& args) {
 			if (args.size() > 0) {
 				loadModule(args[0]);
@@ -36,6 +36,11 @@ namespace baseline {
 		config->addCommand("unloadModule", [&](const std::vector<std::string>& args) {
 			if (args.size() > 0) {
 				unloadModule(args[0]);
+			}
+		});
+		config->addCommand("addModuleDirectory", [&](const std::vector<std::string>& args) {
+			if (args.size() > 0) {
+				addModuleDirectory(args[0]);
 			}
 		});
 	}

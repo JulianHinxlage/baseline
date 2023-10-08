@@ -23,7 +23,7 @@ namespace baseline {
 
 	int toInt(const std::string& str, int defaultValue = -1);
 
-	float toFlot(std::string str, float defaultValue = 0, bool allowCommaAsPoint = false);
+	float toFloat(std::string str, float defaultValue = 0, bool allowCommaAsPoint = false);
 
 	template<typename T>
 	static T fromString(const std::string& string, T defaultValue = T()) {

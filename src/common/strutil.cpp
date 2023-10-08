@@ -90,7 +90,7 @@ namespace baseline {
 		return defaultValue;
 	}
 
-	float toFlot(std::string str, float defaultValue, bool allowCommaAsPoint) {
+	float toFloat(std::string str, float defaultValue, bool allowCommaAsPoint) {
 		if (allowCommaAsPoint) {
 			str = replace(str, ",", ".");
 		}

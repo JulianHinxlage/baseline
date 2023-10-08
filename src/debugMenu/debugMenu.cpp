@@ -53,11 +53,6 @@ void updateCommandsWindow() {
 	auto* window = Singleton::get<baseline::Window>();
 	if (window->beginWindow("commands")) {
 		auto* config = Singleton::get<Config>();
-		for(auto &command : config->getCommandList()){
-			if (ImGui::Button(command.c_str())) {
-				config->execute(command);
-			}
-		}
 
 		static std::string command;
 		ImGui::InputText("command", &command);

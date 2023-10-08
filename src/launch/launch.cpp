@@ -5,6 +5,7 @@
 #include "core/ModuleManager.h"
 #include "core/FileWatcher.h"
 #include "core/Config.h"
+#include "common/Log.h"
 #include <filesystem>
 #include <thread>
 
@@ -62,10 +63,27 @@ private:
 
 int main(int argc, char* argv[]) {
 	auto* launcher = Singleton::get<Launcher>();
+
+	auto* config = Singleton::get<Config>();
+	config->addCommand("runModule", [&](const std::vector<std::string>& args) {
+		if (args.size() > 0) {
+			std::string function = "main";
+			if (args.size() > 1) {
+				function = args[1];
+			}
+			launcher->run(args[0], function, true);
+		}
+	});
+
+	Log::info("directory:  %s", std::filesystem::current_path().string().c_str());
+	Log::info("executable: %s", argv[0]);
+
 	launcher->init(argc, argv);
-	launcher->run("gui", "main", true);
-	launcher->load("debugMenu");
-	launcher->load("test");
 	launcher->joinAll();
+
+	auto* moduleManager = Singleton::get<ModuleManager>();
+	for (auto& m : moduleManager->getLoadedModules()) {
+		moduleManager->unloadModule(m);
+	}
 	return 0;
 }

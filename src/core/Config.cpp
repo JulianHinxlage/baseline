@@ -13,14 +13,22 @@ namespace baseline {
 			Log::warning("log file %s not found", file.c_str());
 			return;
 		}
-		Log::warning("loading config file %s", file.c_str());
+		Log::info("loading config file %s", file.c_str());
 		load(readFile(file));
 	}
 
 	void Config::load(const std::string& text) {
 		auto lines = split(text, "\n");
 		for (auto& line : lines) {
-			execute(line);
+			for (int i = 0; i < line.size(); i++) {
+				if (line[i] == '#') {
+					line.resize(i);
+					break;
+				}
+			}
+			if (!line.empty()) {
+				execute(line);
+			}
 		}
 	}
 
@@ -32,6 +40,7 @@ namespace baseline {
 			}
 		}
 	}
+
 	Config::Var* Config::getVar(const std::string& name) {
 		for (auto& var : vars) {
 			if (var) {
@@ -102,6 +111,16 @@ namespace baseline {
 					}
 				}
 			}
+
+			if (parts.size() > 0) {
+				if (parts[0] == "=") {
+					if (parts.size() > 1) {
+						addVar<std::string>(name, parts[1]);
+						return;
+					}
+				}
+			}
+
 			Log::warning("unknown command: %s", string.c_str());
 		}
 

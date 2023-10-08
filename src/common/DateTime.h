@@ -35,6 +35,7 @@ namespace baseline {
 		std::string toStringDate() const;
 		std::string toStringTime() const;
 		bool fromString(const std::string& str);
+		bool fromStringYYYYMMDD(const std::string& str);
 	};
 
 }

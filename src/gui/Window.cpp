@@ -134,11 +134,13 @@ namespace baseline {
 	}
 
 	void Window::shutdown() {
-		ImGui_ImplOpenGL3_Shutdown();
-		ImGui_ImplGlfw_Shutdown();
-		ImGui::DestroyContext();
-		glfwDestroyWindow((GLFWwindow*)context);
-		glfwTerminate();
+		if (context) {
+			ImGui_ImplOpenGL3_Shutdown();
+			ImGui_ImplGlfw_Shutdown();
+			ImGui::DestroyContext();
+			glfwDestroyWindow((GLFWwindow*)context);
+			glfwTerminate();
+		}
 	}
 
 	void Window::close() {

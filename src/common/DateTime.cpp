@@ -202,4 +202,20 @@ namespace baseline {
 		}
 	}
 
+	bool DateTime::fromStringYYYYMMDD(const std::string& str) {
+		auto parts = split(str, "-");
+		if (parts.size() == 3) {
+			year = toInt(parts[0]);
+			month = toInt(parts[1]);
+			day = toInt(parts[2]);
+			if (year < 100) {
+				year += 2000;
+			}
+			setDate(day, month, year);
+		}
+		else {
+			return false;
+		}
+	}
+
 }

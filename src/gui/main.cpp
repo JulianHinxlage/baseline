@@ -4,6 +4,7 @@
 
 #include <stdio.h>
 #include "common/Log.h"
+#include "core/Config.h"
 #include "core/ModuleManager.h"
 #include "Window.h"
 #include <imgui.h>
@@ -12,10 +13,12 @@
 using namespace baseline;
 
 int main(int arc, char* argv[]) {
-	auto* window = Singleton::get<baseline::Window>();
+	auto* window = Singleton::get<Window>();
+	auto* config = Singleton::get<Config>();
+	std::string title = config->getValue<std::string>("title", "Baseline GUI");
 
 	window->alwaysRefresh = false;
-	window->init(1080, 720, "Baseline GUI", 2);
+	window->init(1080, 720, title, 2);
 
 	while (window->isOpen()) {
 		window->beginFrame();
