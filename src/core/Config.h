@@ -78,7 +78,7 @@ namespace baseline {
 		}
 
 		void addCommand(const std::string& name, const Callback& callback);
-		void execute(const std::string& string);
+		void execute(const std::string& string, bool canCreateVariables = false);
 
 		std::vector<std::string> getCommandList();
 		std::vector<std::string> getVarList();

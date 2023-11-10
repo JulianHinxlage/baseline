@@ -15,6 +15,7 @@ namespace net {
 		errorCallback = nullptr;
 		packetize = false;
 		outbound = false;
+		maxPacketSize = 1024 * 1024 * 16;
 	}
 
 	Connection::Connection(Connection&& conn) {
@@ -140,7 +141,7 @@ namespace net {
 			int bytes = sizeof(packetSize);
 			error = socket->read(&packetSize, bytes);
 			if (!error) {
-				if (packetSize <= 1024 * 1024 * 16 && packetSize >= 0) {
+				if (packetSize <= maxPacketSize && packetSize >= 0) {
 					buffer.reserve(buffer.getWriteIndex() + packetSize);
 
 					while (packetSize > 0) {
@@ -174,13 +175,18 @@ namespace net {
 		return error;
 	}
 
-	void Connection::close() {
+	void Connection::close(bool force) {
 		if (socket) {
 			socket->disconnect();
 		}
 		running = false;
 		if (thread) {
-			thread->join();
+			if (force) {
+				thread->detach();
+			}
+			else {
+				thread->join();
+			}
 			delete thread;
 			thread = nullptr;
 		}
@@ -191,6 +197,30 @@ namespace net {
 			socket->disconnect();
 		}
 		running = false;
+	}
+
+	void Connection::waitWhileRunning() {
+		if (thread) {
+			thread->join();
+		}
+	}
+
+	uint16_t Connection::getPort() const {
+		if (socket) {
+			return socket->getEndpoint().getPort();
+		}
+		else {
+			return 0;
+		}
+	}
+
+	std::string Connection::getAddress() const {
+		if (socket) {
+			return socket->getEndpoint().getAddress();
+		}
+		else {
+			return "";
+		}
 	}
 
 }

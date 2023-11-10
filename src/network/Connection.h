@@ -16,6 +16,7 @@ namespace net {
 		std::shared_ptr<TcpSocket> socket;
 		bool outbound;
 		bool packetize;
+		int maxPacketSize;
 
 		std::function<void(Connection*, Buffer&)> readCallback;
 		std::function<void(Connection*)> disconnectCallback;
@@ -32,8 +33,12 @@ namespace net {
 		bool isRunning();
 		ErrorCode write(Buffer& buffer);
 		ErrorCode read(Buffer &buffer);
-		void close();
+		void close(bool force = false);
 		void disconnect();
+		void waitWhileRunning();
+
+		uint16_t getPort() const;
+		std::string getAddress() const;
 	
 	private:
 		std::thread *thread;

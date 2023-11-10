@@ -10,7 +10,7 @@ namespace baseline {
 	
 	void Config::loadFile(const std::string& file) {
 		if (!std::filesystem::exists(file)) {
-			Log::warning("log file %s not found", file.c_str());
+			Log::warning("config file %s not found", file.c_str());
 			return;
 		}
 		Log::info("loading config file %s", file.c_str());
@@ -27,7 +27,7 @@ namespace baseline {
 				}
 			}
 			if (!line.empty()) {
-				execute(line);
+				execute(line, true);
 			}
 		}
 	}
@@ -39,6 +39,7 @@ namespace baseline {
 				return;
 			}
 		}
+		Log::warning("no log file found");
 	}
 
 	Config::Var* Config::getVar(const std::string& name) {
@@ -77,8 +78,21 @@ namespace baseline {
 		return list;
 	}
 
-	void Config::execute(const std::string& string) {
-		auto parts = split(string, " ");
+	void Config::execute(const std::string& string, bool canCreateVariables) {
+		std::vector<std::string> parts;
+		int i = 0;
+		for (auto& part1 : split(string, "\"", true)) {
+			if (i % 2 == 0) {
+				for (auto& part2 : split(part1, " ")) {
+					parts.push_back(part2);
+				}
+			}
+			else {
+				parts.push_back(part1);
+			}
+			i++;
+		}
+
 		if (parts.size() > 0) {
 			std::string name = parts[0];
 			parts.erase(parts.begin());
@@ -112,7 +126,7 @@ namespace baseline {
 				}
 			}
 
-			if (parts.size() > 0) {
+			if (parts.size() > 0 && canCreateVariables) {
 				if (parts[0] == "=") {
 					if (parts.size() > 1) {
 						addVar<std::string>(name, parts[1]);

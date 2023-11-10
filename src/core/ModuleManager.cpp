@@ -89,6 +89,7 @@ namespace baseline {
 		module->file = file;
 		module->runtimeFile = file;
 
+#if WIN32
 		if (enableHotReloading) {
 			for (int i = 0; i < 10; i++) {
 				std::filesystem::path path(file);
@@ -106,14 +107,14 @@ namespace baseline {
 			}
 		}
 
-#if WIN32
 		module->handle = (void*)LoadLibrary(module->runtimeFile.c_str());
-		if (!module->handle) {
-			Log::error("module %s could not be loaded", name.c_str());
-		}
 #else
 		module->handle = dlopen(runtimePath.c_str(), RTLD_NOW | RTLD_LOCAL);
 #endif
+
+		if (!module->handle) {
+			Log::error("module %s could not be loaded", module->name.c_str());
+		}
 
 		if (enableHotReloading) {
 			Singleton::get<FileWatcher>()->addFile(module->file, [&, name = module->name]() {

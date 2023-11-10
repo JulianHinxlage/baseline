@@ -12,6 +12,7 @@ namespace net {
 	public:
 		std::vector<std::shared_ptr<net::Connection>> connections;
 		bool packetize;
+		int maxPacketSize;
 
 		std::function<void(Connection*, Buffer&)> readCallback;
 		std::function<void(Connection*)> disconnectCallback;
@@ -26,7 +27,8 @@ namespace net {
 		void run();
 		bool isRunning();
 		bool hasAnyConnection();
-		void close();
+		void close(bool force = false);
+		void waitWhileRunning();
 
 		ErrorCode connectAsClient(const Endpoint& endpoint);
 		ErrorCode connectAsClient(const std::string& address, uint16_t port, bool resolve = true, bool prefereIpv4 = false);

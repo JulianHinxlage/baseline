@@ -15,6 +15,7 @@ namespace net {
 		connectCallback = nullptr;
 		errorCallback = nullptr;
 		packetize = false;
+		maxPacketSize = 1024 * 1024 * 16;
 	}
 
 	Server::Server(Server&& server) {
@@ -90,13 +91,18 @@ namespace net {
 		return false;
 	}
 
-	void Server::close() {
+	void Server::close(bool force) {
 		if (listener) {
 			listener->disconnect();
 		}
 		running = false;
 		if (thread) {
-			thread->join();
+			if (force) {
+				thread->detach();
+			}
+			else {
+				thread->join();
+			}
 			delete thread;
 			thread = nullptr;
 		}
@@ -105,6 +111,12 @@ namespace net {
 		connections.clear();
 		tmp.clear();
 		disconnectedConnections.clear();
+	}
+
+	void Server::waitWhileRunning() {
+		if (thread) {
+			thread->join();
+		}
 	}
 
 	ErrorCode Server::connectAsClient(const Endpoint& endpoint) {
@@ -131,6 +143,7 @@ namespace net {
 		disconnectedConnections.clear();
 
 		conn->packetize = packetize;
+		conn->maxPacketSize = maxPacketSize;
 		conn->readCallback = readCallback;
 		conn->errorCallback = errorCallback;
 		conn->disconnectCallback = [&](Connection* conn) {

@@ -12,7 +12,7 @@ namespace baseline {
 	public:
 		template<typename Class>
 		static Class *get() {
-			Class** instance = getInstance<Class>();
+			static Class** instance = getInstance<Class>();
 			if (*instance == nullptr) {
 				*instance = new Class();
 			}
