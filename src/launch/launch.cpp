@@ -21,6 +21,9 @@ int main(int argc, char* argv[]) {
 	Log::info("executable: %s", argv[0]);
 
 	launcher->init(argc, argv, BL_LAUNCH_CONFIG_STR);
+
+	system("pause");
+
 	launcher->joinAll();
 	launcher->shutdown();
 	return 0;

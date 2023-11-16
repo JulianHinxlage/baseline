@@ -29,7 +29,7 @@ assign_source_group(ALL_SOURCES)
 ### Common ##################
 project(common)
 file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS src/common/*.cpp src/common/*.h)
-add_library(${PROJECT_NAME} STATIC ${SOURCES})
+add_library(${PROJECT_NAME} SHARED ${SOURCES})
 include_directories(${PROJECT_NAME} PRIVATE src)
 set_target_properties(${PROJECT_NAME} PROPERTIES FOLDER ${SOLUTION_NAME})
 

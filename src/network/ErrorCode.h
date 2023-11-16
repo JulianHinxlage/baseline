@@ -4,9 +4,11 @@
 
 #pragma once
 
+#undef NO_ERROR
+
 namespace net {
 
-	enum ErrorCode {
+	enum class ErrorCode {
 		NO_ERROR = 0,
 		GENERAL_ERROR,
 		CONNECTION_REFUSED,

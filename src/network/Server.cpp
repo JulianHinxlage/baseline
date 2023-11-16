@@ -21,7 +21,7 @@ namespace net {
 	Server::Server(Server&& server) {
 		listener = server.listener;
 		thread = server.thread;
-		running = server.running;
+		running = server.running.load();
 		connections = server.connections;
 		readCallback = server.readCallback;
 		disconnectCallback = server.disconnectCallback;
@@ -46,7 +46,7 @@ namespace net {
 			listener = std::make_shared<TcpSocket>();
 		}
 		ErrorCode error = listener->listen(port, prefereIpv4, reuseAddress, dualStacking);
-		if (error) {
+		if (error != ErrorCode::NO_ERROR) {
 			if (errorCallback) {
 				errorCallback(nullptr, error);
 			}
@@ -95,22 +95,25 @@ namespace net {
 		if (listener) {
 			listener->disconnect();
 		}
-		running = false;
-		if (thread) {
-			if (force) {
-				thread->detach();
-			}
-			else {
-				thread->join();
-			}
-			delete thread;
-			thread = nullptr;
-		}
 
 		auto tmp = connections;
 		connections.clear();
 		tmp.clear();
 		disconnectedConnections.clear();
+
+		running = false;
+		if (thread) {
+			if (thread->joinable()) {
+				if (force) {
+					thread->detach();
+				}
+				else {
+					thread->join();
+				}
+			}
+			delete thread;
+			thread = nullptr;
+		}
 	}
 
 	void Server::waitWhileRunning() {
@@ -123,7 +126,7 @@ namespace net {
 		std::shared_ptr<Connection> conn = std::make_shared<Connection>();
 		conn->errorCallback = errorCallback;
 		ErrorCode error = conn->connect(endpoint);
-		if (!error) {
+		if (error == ErrorCode::NO_ERROR) {
 			addConnection(conn);
 		}
 		return error;
@@ -133,7 +136,7 @@ namespace net {
 		std::shared_ptr<Connection> conn = std::make_shared<Connection>();
 		conn->errorCallback = errorCallback;
 		ErrorCode error = conn->connect(address, port, resolve, prefereIpv4);
-		if (!error) {
+		if (error == ErrorCode::NO_ERROR) {
 			addConnection(conn);
 		}
 		return error;

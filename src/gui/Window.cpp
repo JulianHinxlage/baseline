@@ -52,6 +52,7 @@ namespace baseline {
 		//init imgui
 		IMGUI_CHECKVERSION();
 		ImGui::CreateContext();
+		imguiContext = ImGui::GetCurrentContext();
 		ImGuiIO& io = ImGui::GetIO(); (void)io;
 		io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
 		io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
@@ -172,6 +173,7 @@ namespace baseline {
 		sub->called = true;
 		if (sub->open) {
 			currentSubWindow = sub;
+			ImGui::SetCurrentContext((ImGuiContext*)imguiContext);
 			if (ImGui::Begin(sub->name.c_str(), &sub->open, ImGuiWindowFlags_NoCollapse)) {
 				return true;
 			}

@@ -43,7 +43,7 @@ namespace net {
 			socket = std::make_shared<TcpSocket>();
 		}
 		ErrorCode error = socket->connect(endpoint);
-		if (error) {
+		if (error != ErrorCode::NO_ERROR) {
 			if (errorCallback) {
 				errorCallback(this, error);
 			}
@@ -62,7 +62,7 @@ namespace net {
 			socket = std::make_shared<TcpSocket>();
 		}
 		ErrorCode error = socket->connect(address, port, resolve, prefereIpv4);
-		if (error) {
+		if (error != ErrorCode::NO_ERROR) {
 			if (errorCallback) {
 				errorCallback(this, error);
 			}
@@ -84,10 +84,10 @@ namespace net {
 		running = true;
 		thread = new std::thread([&]() {
 			Buffer buffer;
-			while (true) {
+			while (running) {
 				buffer.reset();
 				ErrorCode error = read(buffer);
-				if (error) {
+				if (error != ErrorCode::NO_ERROR) {
 					break;
 				}
 				if (readCallback) {
@@ -114,7 +114,7 @@ namespace net {
 		if (packetize) {
 			int packetSize = buffer.size();
 			error = socket->write(&packetSize, sizeof(packetSize));
-			if (!error) {
+			if (error == ErrorCode::NO_ERROR) {
 				error = socket->write(buffer.data(), buffer.size());
 			}
 		}
@@ -122,7 +122,7 @@ namespace net {
 			error = socket->write(buffer.data(), buffer.size());
 		}
 
-		if (error) {
+		if (error != ErrorCode::NO_ERROR) {
 			if (errorCallback) {
 				errorCallback(this, error);
 			}
@@ -140,14 +140,14 @@ namespace net {
 			int packetSize = 0;
 			int bytes = sizeof(packetSize);
 			error = socket->read(&packetSize, bytes);
-			if (!error) {
+			if (error == ErrorCode::NO_ERROR) {
 				if (packetSize <= maxPacketSize && packetSize >= 0) {
 					buffer.reserve(buffer.getWriteIndex() + packetSize);
 
 					while (packetSize > 0) {
 						bytes = packetSize;
 						error = socket->read(buffer.dataWrite(), bytes);
-						if (error) {
+						if (error != ErrorCode::NO_ERROR) {
 							break;
 						}
 						buffer.skipWrite(bytes);
@@ -167,7 +167,7 @@ namespace net {
 			buffer.reserve(buffer.getWriteIndex());
 		}
 
-		if (error) {
+		if (error != ErrorCode::NO_ERROR) {
 			if (errorCallback) {
 				errorCallback(this, error);
 			}
@@ -181,11 +181,13 @@ namespace net {
 		}
 		running = false;
 		if (thread) {
-			if (force) {
-				thread->detach();
-			}
-			else {
-				thread->join();
+			if (thread->joinable()) {
+				if (force) {
+					thread->detach();
+				}
+				else {
+					thread->join();
+				}
 			}
 			delete thread;
 			thread = nullptr;

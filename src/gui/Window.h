@@ -39,7 +39,8 @@ namespace baseline {
 		};
 		std::unordered_map<std::string, std::shared_ptr<SubWindow>> subWindows;
 		std::shared_ptr<SubWindow> currentSubWindow;
-		void *context;
+		void* context = nullptr;
+		void* imguiContext = nullptr;
 
 		class UpdateCallback {
 		public:

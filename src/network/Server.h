@@ -36,7 +36,7 @@ namespace net {
 	private:
 		std::shared_ptr<TcpSocket> listener;
 		std::thread* thread;
-		bool running;
+		std::atomic_bool running;
 		std::vector<std::shared_ptr<net::Connection>> disconnectedConnections;
 
 		void addConnection(std::shared_ptr<net::Connection> conn);

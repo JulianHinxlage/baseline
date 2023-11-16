@@ -6,6 +6,8 @@
 
 #include <string>
 
+#undef ERROR
+
 namespace baseline {
 
 	enum class LogLevel {
@@ -19,6 +21,10 @@ namespace baseline {
 
 	class Log {
 	public:
+		static void setConsoleLogLevel(LogLevel level);
+		static void addLogFile(const std::string& file, LogLevel level);
+		static void removeLogFile(const std::string& file);
+
 		static void log(LogLevel level, const char* fmt, va_list args);
 		static void log(LogLevel level, const char* fmt, ...);
 		static void trace(const char *fmt, ...);

@@ -24,7 +24,9 @@ namespace baseline {
 		auto* moduleManager = Singleton::get<ModuleManager>();
 		moduleManager->enableHotReloading = true;
 		moduleManager->addModuleDirectory(".");
-		moduleManager->addModuleDirectory(std::filesystem::path(argv[0]).parent_path().string());
+		if (argc > 0) {
+			moduleManager->addModuleDirectory(std::filesystem::path(argv[0]).parent_path().string());
+		}
 
 		auto* config = Singleton::get<Config>();
 		config->loadFirstFileFound({ configFile, std::string("../") + configFile , std::string("../../") + configFile, std::string("../../../") + configFile });
