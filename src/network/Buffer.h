@@ -11,6 +11,7 @@ class Buffer {
 public:
     Buffer();
     Buffer(void* data, int bytes);
+    Buffer(const Buffer &buffer);
 
     void writeBytes(const void* ptr, int bytes);
     void readBytes(void* ptr, int bytes);
@@ -21,18 +22,18 @@ public:
     void unskipWrite(int bytes);
 
     void reset();
-    uint8_t* data();
-    int size();
-    uint8_t* dataWrite();
-    int sizeWrite();
+    uint8_t* data() const;
+    int size() const;
+    uint8_t* dataWrite() const;
+    int sizeWrite() const;
 
     void reserve(int bytes);
     void setData(void* data, int bytes);
     void clear();
-    int getReadIndex();
-    int getWriteIndex();
-    bool hasDataLeft();
-    bool isOwningData();
+    int getReadIndex() const;
+    int getWriteIndex() const;
+    bool hasDataLeft() const;
+    bool isOwningData() const;
 
     void writeStr(const std::string& str);
     void readStr(std::string& str);

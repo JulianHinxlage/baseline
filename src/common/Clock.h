@@ -15,6 +15,8 @@ namespace baseline {
         double elapsed();
         double round();
         static double now();
+        static uint64_t nowMilli();
+        static uint64_t nowNano();
         static void sleep(double seconds);
     private:
         uint64_t startTime;

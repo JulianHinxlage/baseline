@@ -8,9 +8,6 @@
 
 namespace baseline {
 
-    uint64_t nowNano(){
-        return std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now().time_since_epoch()).count();
-    }
 
     Clock::Clock() {
         startTime = 0;
@@ -36,6 +33,14 @@ namespace baseline {
 
     double Clock::now() {
         return (double)nowNano() / 1000.0 / 1000.0 / 1000.0;
+    }
+
+    uint64_t Clock::nowMilli() {
+        return nowNano() / 1000 / 1000;
+    }
+
+    uint64_t Clock::nowNano(){
+        return std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now().time_since_epoch()).count();
     }
 
     void Clock::sleep(double seconds){

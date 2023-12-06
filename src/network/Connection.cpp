@@ -106,6 +106,7 @@ namespace net {
 	}
 
 	ErrorCode Connection::write(Buffer& buffer) {
+		std::unique_lock<std::mutex> lock(writeMutex);
 		if (!socket) {
 			return ErrorCode::DISCONNECTED;
 		}

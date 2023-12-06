@@ -20,6 +20,14 @@ Buffer::Buffer(void* data, int bytes) {
 	setData(data, bytes);
 }
 
+Buffer::Buffer(const Buffer& buffer) {
+	dataPtr = nullptr;
+	dataSize = 0;
+	readIndex = 0;
+	writeIndex = 0;
+	writeBytes(buffer.data(), buffer.size());
+}
+
 void Buffer::writeBytes(const void* ptr, int bytes) {
 	int left = dataSize - writeIndex;
 	if (bytes > left) {
@@ -58,19 +66,19 @@ void Buffer::reset() {
 	writeIndex = 0;
 }
 
-uint8_t* Buffer::data() {
+uint8_t* Buffer::data() const {
 	return dataPtr + readIndex;
 }
 
-int Buffer::size() {
+int Buffer::size() const {
 	return dataSize - readIndex;
 }
 
-uint8_t* Buffer::dataWrite() {
+uint8_t* Buffer::dataWrite() const {
 	return dataPtr + writeIndex;
 }
 
-int Buffer::sizeWrite() {
+int Buffer::sizeWrite() const {
 	return dataSize - writeIndex;
 }
 
@@ -104,19 +112,19 @@ void Buffer::clear() {
 	writeIndex = 0;
 }
 
-int Buffer::getReadIndex() {
+int Buffer::getReadIndex() const {
 	return readIndex;
 }
 
-int Buffer::getWriteIndex() {
+int Buffer::getWriteIndex() const {
 	return writeIndex;
 }
 
-bool Buffer::hasDataLeft() {
+bool Buffer::hasDataLeft() const {
     return readIndex < dataSize;
 }
 
-bool Buffer::isOwningData() {
+bool Buffer::isOwningData() const {
     return buffer.data() == dataPtr;
 }
 
@@ -125,6 +133,7 @@ void Buffer::writeStr(const std::string& str) {
 }
 
 void Buffer::readStr(std::string& str) {
+	str.clear();
     while (true) {
         char c = '\0';
         readBytes(&c, 1);

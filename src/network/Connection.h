@@ -8,6 +8,7 @@
 #include "Buffer.h"
 #include <thread>
 #include <functional>
+#include <mutex>
 
 namespace net {
 
@@ -42,6 +43,7 @@ namespace net {
 	
 	private:
 		std::thread *thread;
+		std::mutex writeMutex;
 		bool running;
 	};
 
