@@ -21,6 +21,8 @@ namespace baseline {
 
 	std::string replace(const std::string& string, const std::string& search, const std::string& replacement);
 
+	int match(const std::string& string1, const std::string& string2);
+
 	int toInt(const std::string& str, int defaultValue = -1);
 
 	float toFloat(std::string str, float defaultValue = 0, bool allowCommaAsPoint = false);

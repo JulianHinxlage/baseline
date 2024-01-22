@@ -160,6 +160,10 @@ namespace baseline {
 #endif
 	}
 
+	void Window::setPosition(int x, int y) {
+		glfwSetWindowPos((GLFWwindow*)context, x, y);
+	}
+
 	bool Window::beginWindow(const std::string& name) {
 		auto sub = subWindows[name];
 		if (!sub) {

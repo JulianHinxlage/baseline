@@ -72,6 +72,17 @@ endif()
 target_include_directories(${PROJECT_NAME} PUBLIC libs libs/glfw/include libs/glew/include libs/imgui libs/imgui/backends)
 set_target_properties(glfw uninstall update_mappings PROPERTIES FOLDER Libs)
 
+
+### Render ##################
+project(render)
+file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS src/render/*.cpp src/render/*.h)
+add_library(${PROJECT_NAME} SHARED ${SOURCES})
+include_directories(${PROJECT_NAME} PRIVATE src)
+add_subdirectory(libs/glm)
+target_link_libraries(${PROJECT_NAME} common core gui glm)
+target_include_directories(${PROJECT_NAME} PUBLIC libs/stb)
+set_target_properties(${PROJECT_NAME} PROPERTIES FOLDER ${SOLUTION_NAME})
+
 ### Test ##################
 project(test)
 file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS src/test/*.cpp src/test/*.h)

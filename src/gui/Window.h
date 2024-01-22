@@ -23,6 +23,8 @@ namespace baseline {
 		bool isOpen();
 		void* getContext();
 
+		void setPosition(int x, int y);
+
 		bool beginWindow(const std::string &name);
 		void endWindow();
 		void refresh();

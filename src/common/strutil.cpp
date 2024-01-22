@@ -79,6 +79,24 @@ namespace baseline {
 		return join(split(string, search), replacement);
 	}
 
+	int match(const std::string& string1, const std::string& string2) {
+		int matchCount = 0;
+		for (int i = 0; i < string1.size(); i++) {
+			if (i < string2.size()) {
+				if (string1[i] == string2[i]) {
+					matchCount++;
+				}
+				else {
+					break;
+				}
+			}
+			else {
+				break;
+			}
+		}
+		return matchCount;
+	}
+
 	int toInt(const std::string& str, int defaultValue) {
 		try {
 			int value = std::stoi(str);
