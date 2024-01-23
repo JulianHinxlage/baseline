@@ -22,6 +22,7 @@ namespace baseline {
 		void close();
 		bool isOpen();
 		void* getContext();
+		void* getNativContext();
 
 		void setPosition(int x, int y);
 

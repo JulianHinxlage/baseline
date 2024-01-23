@@ -153,6 +153,10 @@ namespace baseline {
 	}
 
 	void* Window::getContext() {
+		return context;
+	}
+
+	void* Window::getNativContext() {
 #if WIN32
 		return glfwGetWin32Window((GLFWwindow*)context);
 #else
