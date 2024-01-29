@@ -18,6 +18,8 @@ namespace baseline {
 		void loadFile(const std::string& file);
 		void load(const std::string& text);
 		void loadFirstFileFound(const std::vector<std::string>& files);
+		std::string getConfigFilename();
+		std::string getFilename(const std::string& varname, const std::string& defaultValue = "");
 
 		class Var {
 		public:
@@ -111,6 +113,7 @@ namespace baseline {
 
 		std::vector<Var*> vars;
 		std::vector<Command> commands;
+		std::string loadedFile;
 	};
 
 }

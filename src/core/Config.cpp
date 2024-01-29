@@ -14,6 +14,7 @@ namespace baseline {
 			return;
 		}
 		Log::info("loading config file %s", file.c_str());
+		loadedFile = file;
 		load(readFile(file));
 	}
 
@@ -39,7 +40,19 @@ namespace baseline {
 				return;
 			}
 		}
-		Log::warning("no log file found");
+		Log::warning("no config file found");
+	}
+
+	std::string Config::getConfigFilename() {
+		return loadedFile;
+	}
+
+	std::string Config::getFilename(const std::string& varname, const std::string& defaultValue) {
+		std::string value = getValue<std::string>(varname, defaultValue);
+		if (value.empty()) {
+			return "";
+		}
+		return std::filesystem::path(getConfigFilename()).parent_path().string() + "/" + value;
 	}
 
 	Config::Var* Config::getVar(const std::string& name) {
