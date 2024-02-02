@@ -168,7 +168,15 @@ namespace baseline {
 		glfwSetWindowPos((GLFWwindow*)context, x, y);
 	}
 
-	bool Window::beginWindow(const std::string& name) {
+	void Window::setSize(int x, int y) {
+		glfwSetWindowSize((GLFWwindow*)context, x, y);
+	}
+
+	void Window::setTitle(const std::string& title) {
+		glfwSetWindowTitle((GLFWwindow*)context, title.c_str());
+	}
+
+	bool Window::beginWindow(const std::string& name, int flags) {
 		auto sub = subWindows[name];
 		if (!sub) {
 			subWindows[name] = std::make_shared<SubWindow>();
@@ -182,7 +190,7 @@ namespace baseline {
 		if (sub->open) {
 			currentSubWindow = sub;
 			ImGui::SetCurrentContext((ImGuiContext*)imguiContext);
-			if (ImGui::Begin(sub->name.c_str(), &sub->open, ImGuiWindowFlags_NoCollapse)) {
+			if (ImGui::Begin(sub->name.c_str(), &sub->open, ImGuiWindowFlags_NoCollapse | flags)) {
 				return true;
 			}
 		}

@@ -61,6 +61,15 @@ namespace baseline {
 		}
 	}
 
+	void Log::removeAllLogFiles() {
+		std::unique_lock<std::mutex> lock(mutex);
+		for (int i = 0; i < logFiles.size(); i++) {
+			logFiles[i].stream.close();
+			logFiles.erase(logFiles.begin() + i);
+			i--;
+		}
+	}
+
 	void Log::log(LogLevel level, const char* fmt, va_list args) {
 		std::unique_lock<std::mutex> lock(mutex);
 

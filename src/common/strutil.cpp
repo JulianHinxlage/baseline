@@ -7,20 +7,30 @@
 
 namespace baseline {
 
-	std::string readFile(const std::string& file) {
-		std::ifstream stream(file);
-		if (stream.is_open()) {
-			return std::string((std::istreambuf_iterator<char>(stream)), (std::istreambuf_iterator<char>()));
+	std::string readFile(const std::string& file, bool binary) {
+		FILE *f = fopen(file.c_str(), binary ? "rb" : "r");
+		if (f) {
+			fseek(f, 0, SEEK_END);
+			int size = ftell(f);
+			fseek(f, 0, SEEK_SET);
+			std::string text;
+			text.resize(size);
+			int bytes = fread(text.data(), 1, text.size(), f);
+			text.resize(bytes);
+			fclose(f);
+			return text;
 		}
 		else {
 			return "";
 		}
 	}
 
-	void writeFile(const std::string& file, const std::string& text) {
-		std::ofstream stream(file);
-		stream << text;
-		stream.close();
+	void writeFile(const std::string& file, const std::string& text, bool binary) {
+		FILE* f = fopen(file.c_str(), binary ? "wb" : "w");
+		if (f) {
+			fwrite(text.data(), 1, text.size(), f);
+			fclose(f);
+		}
 	}
 
 	std::vector<std::string> split(const std::string& string, const std::string& delimiter, bool includeEmpty) {
@@ -95,6 +105,82 @@ namespace baseline {
 			}
 		}
 		return matchCount;
+	}
+
+	void trimFront(std::string& string, const std::string& prefix, bool trimAllIfNotFound) {
+		if (prefix.empty()) {
+			return;
+		}
+
+		int matchIndex = 0;
+		int trimIndex = 0;
+		for (int i = 0; i < string.size(); i++) {
+			char c = string[i];
+			if (c == prefix[matchIndex]) {
+				matchIndex++;
+				if (matchIndex == prefix.size()) {
+					matchIndex = 0;
+					trimIndex = i + 1;
+					break;
+				}
+			}
+			else {
+				matchIndex = 0;
+			}
+		}
+
+		if (trimIndex != 0) {
+			string = string.substr(trimIndex);
+		}
+		else if (trimAllIfNotFound) {
+			string = "";
+		}
+	}
+
+	void trimBack(std::string& string, const std::string& suffix) {
+		if (suffix.empty()) {
+			return;
+		}
+
+		int matchIndex = 0;
+		int trimIndex = 0;
+		for (int i = 0; i < string.size(); i++) {
+			char c = string[i];
+			if (c == suffix[matchIndex]) {
+				matchIndex++;
+				if (matchIndex == suffix.size()) {
+					matchIndex = 0;
+					trimIndex = i - suffix.size() + 1;
+					break;
+				}
+			}
+			else {
+				matchIndex = 0;
+			}
+		}
+
+		if (trimIndex != 0) {
+			string = string.substr(0, trimIndex);
+		}
+	}
+
+	std::string subString(const std::string& string, const std::string& prefix, const std::string& suffix) {
+		std::string str = string;
+		trimFront(str, prefix, true);
+		trimBack(str, suffix);
+		return str;
+	}
+
+	std::string leftPadd(const std::string& string, char character, int targetLength) {
+		std::string str = string;
+		while (str.size() < targetLength) {
+			str.insert(str.begin(), character);
+		}
+		return str;
+	}
+
+	bool containsString(const std::string& string, const std::string& subString) {
+		return split(string, subString, true).size() > 1;
 	}
 
 	int toInt(const std::string& str, int defaultValue) {

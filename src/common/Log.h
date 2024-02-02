@@ -24,6 +24,7 @@ namespace baseline {
 		static void setConsoleLogLevel(LogLevel level);
 		static void addLogFile(const std::string& file, LogLevel level);
 		static void removeLogFile(const std::string& file);
+		static void removeAllLogFiles();
 
 		static void log(LogLevel level, const char* fmt, va_list args);
 		static void log(LogLevel level, const char* fmt, ...);

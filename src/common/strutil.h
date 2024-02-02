@@ -9,9 +9,9 @@
 
 namespace baseline {
 
-	std::string readFile(const std::string& file);
+	std::string readFile(const std::string& file, bool binary = false);
 
-	void writeFile(const std::string& file, const std::string& text);
+	void writeFile(const std::string& file, const std::string& text, bool binary = false);
 
 	std::vector<std::string> split(const std::string& string, const std::string& delimiter, bool includeEmpty = false);
 
@@ -22,6 +22,16 @@ namespace baseline {
 	std::string replace(const std::string& string, const std::string& search, const std::string& replacement);
 
 	int match(const std::string& string1, const std::string& string2);
+
+	void trimFront(std::string& string, const std::string& prefix, bool trimAllIfNotFound = false);
+
+	void trimBack(std::string& string, const std::string& suffix);
+
+	std::string subString(const std::string& string, const std::string& prefix, const std::string& suffix);
+
+	std::string leftPadd(const std::string& string, char character, int targetLength);
+
+	bool containsString(const std::string& string, const std::string& subString);
 
 	int toInt(const std::string& str, int defaultValue = -1);
 

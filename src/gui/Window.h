@@ -25,8 +25,10 @@ namespace baseline {
 		void* getNativContext();
 
 		void setPosition(int x, int y);
+		void setSize(int x, int y);
+		void setTitle(const std::string& title);
 
-		bool beginWindow(const std::string &name);
+		bool beginWindow(const std::string &name, int flags = 0);
 		void endWindow();
 		void refresh();
 

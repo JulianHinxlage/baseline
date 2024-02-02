@@ -52,6 +52,9 @@ namespace baseline {
 		if (value.empty()) {
 			return "";
 		}
+		if (getConfigFilename().empty()) {
+			return value;
+		}
 		return std::filesystem::path(getConfigFilename()).parent_path().string() + "/" + value;
 	}
 
