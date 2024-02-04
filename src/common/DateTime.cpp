@@ -57,7 +57,29 @@ namespace baseline {
 	void DateTime::now(bool localTime){
 		time_t t;
 		time(&t);
+		fromTimeStamp(t, localTime);
+	}
 
+	uint32_t DateTime::toTimeStamp(bool localTime) {
+		struct tm tm;
+
+		tm.tm_year = year - 1900;
+		tm.tm_mon = month - 1;
+		tm.tm_mday = day;
+		tm.tm_hour = hour;
+		tm.tm_min = minute;
+		tm.tm_sec = second;
+
+		if (localTime) {
+			return mktime(&tm);
+		}
+		else {
+			return _mkgmtime(&tm);
+		}
+	}
+
+	void DateTime::fromTimeStamp(uint32_t time, bool localTime) {
+		time_t t = time;
 		struct tm* tm = nullptr;
 		if (localTime) {
 			tm = localtime(&t);

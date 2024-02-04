@@ -180,7 +180,20 @@ namespace baseline {
 	}
 
 	bool containsString(const std::string& string, const std::string& subString) {
-		return split(string, subString, true).size() > 1;
+		int matchIndex = 0;
+		for (int i = 0; i < string.size(); i++) {
+			char c = string[i];
+			if (c == subString[matchIndex]) {
+				matchIndex++;
+				if (matchIndex == subString.size()) {
+					return true;
+				}
+			}
+			else {
+				matchIndex = 0;
+			}
+		}
+		return false;
 	}
 
 	int toInt(const std::string& str, int defaultValue) {
