@@ -20,7 +20,7 @@ namespace baseline {
 		~FileWatcher();
 		void start();
 		void stop();
-		void addFile(const std::string& file, const Callback& callback);
+		void addFile(const std::string& file, const Callback& callback, bool onlyOneInvoke = false);
 		void removeFile(const std::string& file);
 	private:
 		class Handle {

@@ -78,6 +78,7 @@ namespace baseline {
 
 		for (auto& f : logFiles) {
 			if (level >= f.level) {
+				f.stream << "[" << time.toStringDate() << "] ";
 				f.stream << "[" << time.toStringTime() << "] ";
 				f.stream << "[" << logLevelName(level) << "] ";
 				char buf[1024];
@@ -89,6 +90,7 @@ namespace baseline {
 		}
 
 		if (level >= consoleLevel) {
+			printf("[%s] ", time.toStringDate().c_str());
 			printf("[%s] ", time.toStringTime().c_str());
 			printf("[%s] ", logLevelName(level));
 			vprintf(fmt, args);

@@ -65,7 +65,7 @@ namespace baseline {
 		}
 	}
 
-	void FileWatcher::addFile(const std::string& file, const Callback& callback) {
+	void FileWatcher::addFile(const std::string& file, const Callback& callback, bool onlyOneInvoke) {
 		std::unique_lock<std::mutex> lock(mutex);
 
 		std::string absolut = std::filesystem::absolute(file).string();
@@ -80,6 +80,7 @@ namespace baseline {
 		handle.file = absolut;
 		handle.callback = callback;
 		handle.timestamp = getTimestamp(absolut);
+		handle.onlyOneInvoke = onlyOneInvoke;
 
 		handles.push_back(handle);
 	}

@@ -19,6 +19,7 @@ namespace baseline {
 	}
 
 	void Config::load(const std::string& text) {
+		vars.clear();
 		auto lines = split(text, "\n");
 		for (auto& line : lines) {
 			for (int i = 0; i < line.size(); i++) {
