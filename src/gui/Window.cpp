@@ -183,14 +183,27 @@ namespace baseline {
 			sub = subWindows[name];
 			sub->name = name;
 			sub->open = false;
+			sub->visible = false;
 		}
+
+		bool focusSetup = ImGui::GetFrameCount() < 3;
+		bool focus = sub->visible && focusSetup;
 
 		currentSubWindow = nullptr;
 		sub->called = true;
+		if (!focusSetup) {
+			sub->visible = false;
+		}
 		if (sub->open) {
 			currentSubWindow = sub;
 			ImGui::SetCurrentContext((ImGuiContext*)imguiContext);
+			if (focus) {
+				ImGui::SetNextWindowFocus();
+			}
 			if (ImGui::Begin(sub->name.c_str(), &sub->open, ImGuiWindowFlags_NoCollapse | flags)) {
+				if (!focusSetup) {
+					sub->visible = true;
+				}
 				return true;
 			}
 		}
@@ -280,10 +293,17 @@ namespace baseline {
 					sub = window->subWindows[name];
 					sub->name = name;
 					sub->open = false;
+					sub->visible = false;
 				}
 
 				try {
-					sub->open = std::stoi(parts[1]);
+					auto values = split(parts[1], ",");
+					if (values.size() > 0) {
+						sub->open = std::stoi(values[0]);
+					}
+					if (values.size() > 1) {
+						sub->visible = std::stoi(values[1]);
+					}
 				}
 				catch (...) {}
 			}
@@ -293,7 +313,7 @@ namespace baseline {
 			Window* window = (Window*)handler->UserData;
 			buf->append("[OpenFlags][]\n");
 			for (auto& sub : window->subWindows) {
-				buf->appendf("%s=%i\n", sub.second->name.c_str(), (int)sub.second->open);
+				buf->appendf("%s=%i,%i\n", sub.second->name.c_str(), (int)sub.second->open, (int)sub.second->visible);
 			}
 			buf->appendf("\n");
 		};

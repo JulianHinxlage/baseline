@@ -5,6 +5,7 @@
 #pragma once
 
 #include <string>
+#include <functional>
 
 #undef ERROR
 
@@ -23,6 +24,7 @@ namespace baseline {
 	public:
 		static void setConsoleLogLevel(LogLevel level);
 		static void addLogFile(const std::string& file, LogLevel level);
+		static void setLogCallback(const std::function<void(LogLevel level, const std::string &message)>& callback);
 		static void removeLogFile(const std::string& file);
 		static void removeAllLogFiles();
 

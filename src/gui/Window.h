@@ -40,6 +40,7 @@ namespace baseline {
 		public:
 			bool open = false;
 			bool called = false;
+			bool visible = false;
 			std::string name = "";
 		};
 		std::unordered_map<std::string, std::shared_ptr<SubWindow>> subWindows;

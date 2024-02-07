@@ -7,6 +7,7 @@
 #include <cstdarg>
 #include <mutex>
 #include <fstream>
+#include <filesystem>
 
 namespace baseline {
 
@@ -39,15 +40,24 @@ namespace baseline {
 		std::ofstream stream;
 	};
 	std::vector<LogFile> logFiles;
+	std::function<void(LogLevel level, const std::string& message)> logCallback = nullptr;
 
 	void Log::setConsoleLogLevel(LogLevel level) {
 		consoleLevel = level;
 	}
 
 	void Log::addLogFile(const std::string& file, LogLevel level) {
+		if (!std::filesystem::exists(std::filesystem::path(file).parent_path())) {
+			std::filesystem::create_directories(std::filesystem::path(file).parent_path());
+		}
+
 		std::unique_lock<std::mutex> lock(mutex);
 		logFiles.push_back({ file, level });
 		logFiles.back().stream.open(file, std::ios_base::app);
+	}
+
+	void Log::setLogCallback(const std::function<void(LogLevel level, const std::string& message)>& callback) {
+		logCallback = callback;
 	}
 
 	void Log::removeLogFile(const std::string& file) {
@@ -81,12 +91,25 @@ namespace baseline {
 				f.stream << "[" << time.toStringDate() << "] ";
 				f.stream << "[" << time.toStringTime() << "] ";
 				f.stream << "[" << logLevelName(level) << "] ";
-				char buf[1024];
+				char buf[10240];
 				int i = vsprintf_s(buf, fmt, args);
 				buf[i] = '\0';
 				f.stream << (const char*)buf << "\n";
 				f.stream.flush();
 			}
+		}
+
+		if (logCallback) {
+			std::stringstream s;
+			s << "[" << time.toStringDate() << "] ";
+			s << "[" << time.toStringTime() << "] ";
+			s << "[" << logLevelName(level) << "] ";
+			char buf[10240];
+			int i = vsprintf_s(buf, fmt, args);
+			buf[i] = '\0';
+			s << (const char*)buf << "\n";
+
+			logCallback(level, s.str());
 		}
 
 		if (level >= consoleLevel) {
