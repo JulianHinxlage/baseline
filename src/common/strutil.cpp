@@ -86,7 +86,7 @@ namespace baseline {
 	}
 
 	std::string replace(const std::string& string, const std::string& search, const std::string& replacement) {
-		return join(split(string, search), replacement);
+		return join(split(string, search, true), replacement);
 	}
 
 	int match(const std::string& string1, const std::string& string2) {
@@ -179,7 +179,7 @@ namespace baseline {
 		return str;
 	}
 
-	bool containsString(const std::string& string, const std::string& subString) {
+	bool stringContains(const std::string& string, const std::string& subString) {
 		int matchIndex = 0;
 		for (int i = 0; i < string.size(); i++) {
 			char c = string[i];
@@ -219,6 +219,52 @@ namespace baseline {
 			return defaultValue;
 		}
 		return defaultValue;
+	}
+
+	uint8_t hexCharToInt(char hex) {
+		if (hex >= '0' && hex <= '9') {
+			return hex - '0';
+		}
+		else if (hex >= 'a' && hex <= 'f') {
+			return hex - 'a' + 10;
+		}
+		else if (hex >= 'A' && hex <= 'F') {
+			return hex - 'A' + 10;
+		}
+		return 0;
+	}
+
+	uint64_t hexToInt(const std::string& hex) {
+		int result = 0;
+		for (char c : hex) {
+			result <<= 4;
+			result |= hexCharToInt(c);
+		}
+		return result;
+	}
+
+	char intToHexChar(uint8_t value) {
+		return "0123456789ABCDEF"[value & 0x0f];
+	}
+
+	std::string intToHex(uint64_t value) {
+		std::string result;
+		while (value > 0) {
+			result = std::string(1, intToHexChar(value % 16)) + result;
+			value >>= 4;
+		}
+		return result;
+	}
+
+	bool isNumber(const std::string& str) {
+		for (char c : str) {
+			if (c < '0' && c > '9') {
+				if (c != '.') {
+					return false;
+				}
+			}
+		}
+		return true;
 	}
 
 }

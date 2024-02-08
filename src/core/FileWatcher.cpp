@@ -35,7 +35,7 @@ namespace baseline {
 					for (int i = 0; i < handles.size(); i++) {
 						auto& handle = handles[i];
 						uint64_t timestamp = getTimestamp(handle.file);
-						if (timestamp != handle.timestamp) {
+						if (timestamp != handle.timestamp && timestamp != 0) {
 							handle.timestamp = timestamp;
 							if (handle.callback) {
 								lock.unlock();

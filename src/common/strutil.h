@@ -31,11 +31,21 @@ namespace baseline {
 
 	std::string leftPadd(const std::string& string, char character, int targetLength);
 
-	bool containsString(const std::string& string, const std::string& subString);
+	bool stringContains(const std::string& string, const std::string& subString);
 
 	int toInt(const std::string& str, int defaultValue = -1);
 
 	float toFloat(std::string str, float defaultValue = 0, bool allowCommaAsPoint = false);
+
+	uint8_t hexCharToInt(char hex);
+
+	uint64_t hexToInt(const std::string& hex);
+
+	char intToHexChar(uint8_t value);
+
+	std::string intToHex(uint64_t value);
+
+	bool isNumber(const std::string& str);
 
 	template<typename T>
 	static T fromString(const std::string& string, T defaultValue = T()) {

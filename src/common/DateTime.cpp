@@ -173,19 +173,28 @@ namespace baseline {
 		return toStringDate() + " " + toStringTime();
 	}
 
-	std::string DateTime::toStringDate() const {
-		std::string result;
+	std::string DateTime::toStringDate(const std::string format) const {
+		std::string result = format;
+		
+		std::string tmp;
 		if (day < 10) {
-			result += "0";
+			tmp += "0";
 		}
-		result += std::to_string(day);
-		result += ".";
+		tmp += std::to_string(day);
+		result = replace(result, "dd", tmp);
+
+		tmp = "";
 		if (month < 10) {
-			result += "0";
+			tmp += "0";
 		}
-		result += std::to_string(month);
-		result += ".";
-		result += std::to_string(year);
+		tmp += std::to_string(month);
+		result = replace(result, "mm", tmp);
+
+		tmp = std::to_string(year);
+		result = replace(result, "yyyy", tmp);
+		tmp = std::to_string(year % 100);
+		result = replace(result, "yy", tmp);
+
 		return result;
 	}
 

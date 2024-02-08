@@ -34,7 +34,7 @@ namespace baseline {
 		bool operator<=(const DateTime& dateTime) const;
 		bool operator>=(const DateTime& dateTime) const;
 		std::string toString() const;
-		std::string toStringDate() const;
+		std::string toStringDate(const std::string format ="dd.mm.yyyy") const;
 		std::string toStringTime() const;
 		bool fromString(const std::string& str);
 		bool fromStringYYYYMMDD(const std::string& str);
