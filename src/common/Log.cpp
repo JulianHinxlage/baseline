@@ -47,6 +47,9 @@ namespace baseline {
 	}
 
 	void Log::addLogFile(const std::string& file, LogLevel level) {
+		if (file.empty()) {
+			return;
+		}
 		if (!std::filesystem::exists(std::filesystem::path(file).parent_path())) {
 			std::filesystem::create_directories(std::filesystem::path(file).parent_path());
 		}

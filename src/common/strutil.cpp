@@ -25,11 +25,19 @@ namespace baseline {
 		}
 	}
 
-	void writeFile(const std::string& file, const std::string& text, bool binary) {
+	bool writeFile(const std::string& file, const std::string& text, bool binary) {
 		FILE* f = fopen(file.c_str(), binary ? "wb" : "w");
 		if (f) {
-			fwrite(text.data(), 1, text.size(), f);
+			int res = fwrite(text.data(), 1, text.size(), f);
+			if (res != text.size()) {
+				fclose(f);
+				return false;
+			}
 			fclose(f);
+			return true;
+		}
+		else {
+			return false;
 		}
 	}
 

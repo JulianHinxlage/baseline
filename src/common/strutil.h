@@ -11,7 +11,7 @@ namespace baseline {
 
 	std::string readFile(const std::string& file, bool binary = false);
 
-	void writeFile(const std::string& file, const std::string& text, bool binary = false);
+	bool writeFile(const std::string& file, const std::string& text, bool binary = false);
 
 	std::vector<std::string> split(const std::string& string, const std::string& delimiter, bool includeEmpty = false);
 

@@ -56,7 +56,12 @@ namespace baseline {
 		if (getConfigFilename().empty()) {
 			return value;
 		}
-		return std::filesystem::path(getConfigFilename()).parent_path().string() + "/" + value;
+		if (std::filesystem::path(value).is_absolute()) {
+			return value;
+		}
+		else {
+			return std::filesystem::absolute(std::filesystem::path(getConfigFilename()).parent_path().string() + "/" + value).string();
+		}
 	}
 
 	Config::Var* Config::getVar(const std::string& name) {
