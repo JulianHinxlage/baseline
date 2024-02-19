@@ -119,9 +119,9 @@ namespace baseline {
 					lock.lock();
 					activeWorkerCount--;
 					worker->activeTaskId = -1;
-					taskFinished.notify_one();
+					taskFinished.notify_all();
 					if (activeWorkerCount == 0 && tasks.size() == 0) {
-						allTasksFinished.notify_one();
+						allTasksFinished.notify_all();
 					}
 					needToWait = false;
 				}
