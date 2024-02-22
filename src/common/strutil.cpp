@@ -10,15 +10,20 @@ namespace baseline {
 	std::string readFile(const std::string& file, bool binary) {
 		FILE *f = fopen(file.c_str(), binary ? "rb" : "r");
 		if (f) {
-			fseek(f, 0, SEEK_END);
-			int size = ftell(f);
-			fseek(f, 0, SEEK_SET);
-			std::string text;
-			text.resize(size);
-			int bytes = fread(text.data(), 1, text.size(), f);
-			text.resize(bytes);
-			fclose(f);
-			return text;
+			try {
+				fseek(f, 0, SEEK_END);
+				int size = ftell(f);
+				fseek(f, 0, SEEK_SET);
+				std::string text;
+				text.resize(size);
+				int bytes = fread(text.data(), 1, text.size(), f);
+				text.resize(bytes);
+				fclose(f);
+				return text;
+			}
+			catch (...) {
+				return "";
+			}
 		}
 		else {
 			return "";

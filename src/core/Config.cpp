@@ -14,6 +14,7 @@ namespace baseline {
 			return;
 		}
 		Log::info("loading config file %s", file.c_str());
+		prevLoadedFile = loadedFile;
 		loadedFile = file;
 		load(readFile(file));
 	}
@@ -56,11 +57,17 @@ namespace baseline {
 		if (getConfigFilename().empty()) {
 			return value;
 		}
+
 		if (std::filesystem::path(value).is_absolute()) {
 			return value;
 		}
 		else {
-			return std::filesystem::absolute(std::filesystem::path(getConfigFilename()).parent_path().string() + "/" + value).string();
+			if (value[0] == '$') {
+				return std::filesystem::absolute(std::filesystem::path(prevLoadedFile).parent_path().string() + "/" + value.substr(1)).string();
+			}
+			else {
+				return std::filesystem::absolute(std::filesystem::path(getConfigFilename()).parent_path().string() + "/" + value).string();
+			}
 		}
 	}
 

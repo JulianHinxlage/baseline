@@ -114,6 +114,7 @@ namespace baseline {
 		std::vector<Var*> vars;
 		std::vector<Command> commands;
 		std::string loadedFile;
+		std::string prevLoadedFile;
 	};
 
 }
