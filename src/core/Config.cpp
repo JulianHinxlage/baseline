@@ -9,10 +9,17 @@
 namespace baseline {
 	
 	void Config::loadFile(const std::string& file) {
-		if (!std::filesystem::exists(file)) {
+		try {
+			if (!std::filesystem::exists(file)) {
+				Log::warning("config file %s not found", file.c_str());
+				return;
+			}
+		}
+		catch (...) {
 			Log::warning("config file %s not found", file.c_str());
 			return;
 		}
+
 		Log::info("loading config file %s", file.c_str());
 		prevLoadedFile = loadedFile;
 		loadedFile = file;
