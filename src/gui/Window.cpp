@@ -22,7 +22,7 @@ static void glfw_error_callback(int error, const char* description) {
 
 namespace baseline {
 
-	bool Window::init(int width, int height, const std::string& title, int swapInterval) {
+	bool Window::init(int width, int height, const std::string& title, int swapInterval, bool maximized) {
 		//init glfw
 		glfwSetErrorCallback(glfw_error_callback);
 		if (!glfwInit()) {
@@ -34,6 +34,10 @@ namespace baseline {
 		const char* glsl_version = "#version 130";
 		glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
+		if (maximized) {
+			glfwWindowHint(GLFW_MAXIMIZED, 1);
+		}
+
 		context = (void*)glfwCreateWindow(width, height, title.c_str(), nullptr, nullptr);
 		if (!context) {
 			printf("failed to create Window\n");

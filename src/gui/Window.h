@@ -15,7 +15,7 @@ namespace baseline {
 	public:
 		bool alwaysRefresh = false;
 
-		bool init(int width, int height, const std::string &title, int swapInterval = 1);
+		bool init(int width, int height, const std::string &title, int swapInterval = 1, bool maximized = false);
 		void beginFrame();
 		void endFrame();
 		void shutdown();
