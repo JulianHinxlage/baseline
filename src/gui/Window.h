@@ -8,6 +8,7 @@
 #include <unordered_map>
 #include <memory>
 #include <functional>
+#include <glm/glm/glm.hpp>
 
 namespace baseline {
 
@@ -27,6 +28,7 @@ namespace baseline {
 		void setPosition(int x, int y);
 		void setSize(int x, int y);
 		void setTitle(const std::string& title);
+		glm::vec2 getMonitorResolution();
 
 		bool beginWindow(const std::string &name, int flags = 0);
 		void endWindow();

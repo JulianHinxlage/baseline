@@ -94,9 +94,14 @@ namespace baseline {
 				f.stream << "[" << time.toStringDate() << "] ";
 				f.stream << "[" << time.toStringTime() << "] ";
 				f.stream << "[" << logLevelName(level) << "] ";
-				char buf[10240];
-				int i = vsprintf_s(buf, 10240, fmt, args);
-				buf[i] = '\0';
+				char buf[102400];
+				try {
+					int i = vsprintf_s(buf, 102400, fmt, args);
+					buf[i] = '\0';
+				}
+				catch (...) {
+					buf[0] = '\0';
+				}
 				f.stream << (const char*)buf << "\n";
 				f.stream.flush();
 			}
@@ -107,9 +112,14 @@ namespace baseline {
 			s << "[" << time.toStringDate() << "] ";
 			s << "[" << time.toStringTime() << "] ";
 			s << "[" << logLevelName(level) << "] ";
-			char buf[10240];
-			int i = vsprintf_s(buf, 10240, fmt, args);
-			buf[i] = '\0';
+			char buf[102400];
+			try {
+				int i = vsprintf_s(buf, 102400, fmt, args);
+				buf[i] = '\0';
+			}
+			catch (...) {
+				buf[0] = '\0';
+			}
 			s << (const char*)buf << "\n";
 
 			logCallback(level, s.str());

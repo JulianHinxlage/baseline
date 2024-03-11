@@ -180,6 +180,11 @@ namespace baseline {
 		glfwSetWindowTitle((GLFWwindow*)context, title.c_str());
 	}
 
+	glm::vec2 Window::getMonitorResolution() {
+		const GLFWvidmode* mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
+		return { mode->width, mode->height };
+	}
+
 	bool Window::beginWindow(const std::string& name, int flags) {
 		auto sub = subWindows[name];
 		if (!sub) {
