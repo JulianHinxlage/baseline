@@ -33,6 +33,10 @@ namespace baseline {
 
 	bool stringContains(const std::string& string, const std::string& subString);
 
+	std::string toLower(const std::string& string);
+	
+	std::string toUpper(const std::string& string);
+
 	int toInt(const std::string& str, int defaultValue = -1);
 
 	float toFloat(std::string str, float defaultValue = 0, bool allowCommaAsPoint = false);

@@ -209,6 +209,32 @@ namespace baseline {
 		return false;
 	}
 
+	std::string toLower(const std::string& string) {
+		std::string result;
+		for (char c : string) {
+			if (c >= 'A' && c <= 'Z') {
+				result.push_back(c - 'A' + 'a');
+			}
+			else {
+				result.push_back(c);
+			}
+		}
+		return result;
+	}
+
+	std::string toUpper(const std::string& string) {
+		std::string result;
+		for (char c : string) {
+			if (c >= 'a' && c <= 'z') {
+				result.push_back(c - 'a' + 'A');
+			}
+			else {
+				result.push_back(c);
+			}
+		}
+		return result;
+	}
+
 	int toInt(const std::string& str, int defaultValue) {
 		try {
 			int value = std::stoi(str);
@@ -270,11 +296,18 @@ namespace baseline {
 	}
 
 	bool isNumber(const std::string& str) {
-		for (char c : str) {
-			if (c < '0' && c > '9') {
-				if (c != '.') {
-					return false;
+		bool foundDot = false;
+		for (int i = 0; i < str.size(); i++) {
+			char c = str[i];
+			if (c < '0' || c > '9') {
+				if (c == '.' && !foundDot) {
+					foundDot = true;
+					continue;
 				}
+				if (c == '-' && i == 0) {
+					continue;
+				}
+				return false;
 			}
 		}
 		return true;
