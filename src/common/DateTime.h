@@ -23,7 +23,7 @@ namespace baseline {
 		DateTime(int day, int month, int year, int hour, int minute, int second);
 		void setDate(int day, int month, int year);
 		void setTime(int hour, int minute, int second);
-		void now(bool localTime = true);
+		static DateTime now(bool localTime = true);
 		uint32_t toTimeStamp(bool localTime = true);
 		void fromTimeStamp(uint32_t time, bool localTime = true);
 		void resetTime();

@@ -140,6 +140,7 @@ namespace baseline {
 
 	void Window::shutdown() {
 		if (context) {
+			ImGui::SaveIniSettingsToDisk(ImGui::GetIO().IniFilename);
 			ImGui_ImplOpenGL3_Shutdown();
 			ImGui_ImplGlfw_Shutdown();
 			ImGui::DestroyContext();
@@ -185,7 +186,7 @@ namespace baseline {
 		return { mode->width, mode->height };
 	}
 
-	bool Window::beginWindow(const std::string& name, int flags) {
+	bool Window::beginWindow(const std::string& name, int flags, const std::string& menu) {
 		auto sub = subWindows[name];
 		if (!sub) {
 			subWindows[name] = std::make_shared<SubWindow>();
@@ -194,6 +195,7 @@ namespace baseline {
 			sub->open = false;
 			sub->visible = false;
 		}
+		sub->menu = menu;
 
 		bool focusSetup = ImGui::GetFrameCount() < 3;
 		bool focus = sub->visible && focusSetup;
@@ -260,13 +262,13 @@ namespace baseline {
 	void Window::updateMenu() {
 		if (ImGui::BeginMainMenuBar()) {
 			if (subWindows.size() > 0) {
-				if (ImGui::BeginMenu("View")) {
-					for (auto& sub : subWindows) {
-						if (sub.second->called) {
+				for (auto& sub : subWindows) {
+					if (sub.second->called) {
+						if (ImGui::BeginMenu(sub.second->menu.c_str())) {
 							ImGui::MenuItem(sub.second->name.c_str(), nullptr, &sub.second->open);
+							ImGui::EndMenu();
 						}
 					}
-					ImGui::EndMenu();
 				}
 			}
 			ImGui::EndMainMenuBar();

@@ -50,9 +50,13 @@ namespace baseline {
 		if (file.empty()) {
 			return;
 		}
-		if (!std::filesystem::exists(std::filesystem::path(file).parent_path())) {
-			std::filesystem::create_directories(std::filesystem::path(file).parent_path());
+
+		try {
+			if (!std::filesystem::exists(std::filesystem::path(file).parent_path())) {
+				std::filesystem::create_directories(std::filesystem::path(file).parent_path());
+			}
 		}
+		catch (...) {}
 
 		std::unique_lock<std::mutex> lock(mutex);
 		logFiles.push_back({ file, level });

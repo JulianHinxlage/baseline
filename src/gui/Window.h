@@ -30,7 +30,7 @@ namespace baseline {
 		void setTitle(const std::string& title);
 		glm::vec2 getMonitorResolution();
 
-		bool beginWindow(const std::string &name, int flags = 0);
+		bool beginWindow(const std::string &name, int flags = 0, const std::string &menu = "View");
 		void endWindow();
 		void refresh();
 
@@ -44,6 +44,7 @@ namespace baseline {
 			bool called = false;
 			bool visible = false;
 			std::string name = "";
+			std::string menu = "";
 		};
 		std::unordered_map<std::string, std::shared_ptr<SubWindow>> subWindows;
 		std::shared_ptr<SubWindow> currentSubWindow;

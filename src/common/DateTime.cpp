@@ -54,10 +54,12 @@ namespace baseline {
 		this->second = std::min(this->second, 59);
 	}
 
-	void DateTime::now(bool localTime){
+	DateTime DateTime::now(bool localTime){
+		DateTime dt;
 		time_t t;
 		time(&t);
-		fromTimeStamp(t, localTime);
+		dt.fromTimeStamp(t, localTime);
+		return dt;
 	}
 
 	uint32_t DateTime::toTimeStamp(bool localTime) {
