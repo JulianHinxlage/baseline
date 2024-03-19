@@ -21,6 +21,29 @@ namespace baseline {
 		std::shared_ptr<TypeDescriptor> type = nullptr;
 	};
 
+	class TypeOps {
+	public:
+		virtual void construct(void* ptr) = 0;
+		virtual void destruct(void* ptr) = 0;
+		virtual void* alloc() = 0;
+		virtual void free(void *ptr) = 0;
+		virtual bool equals(void* lhs, void* rhs) = 0;
+		virtual bool hasEquals() = 0;
+		virtual void assign(void* lhs, void* rhs) = 0;
+		virtual void copy(void* lhs, void* rhs) = 0;
+		virtual void move(void* lhs, void* rhs) = 0;
+	};
+
+	class VectorOps {
+	public:
+		virtual int size(void* ptr) = 0;
+		virtual void clear(void* ptr) = 0;
+		virtual void resize(void* ptr, int size) = 0;
+		virtual void insert(void* ptr, int index, void *value) = 0;
+		virtual void earase(void* ptr, int index) = 0;
+		virtual void* get(void* ptr, int index) = 0;
+	};
+
 	class TypeDescriptor {
 	public:
 		enum class Flags {
@@ -40,11 +63,117 @@ namespace baseline {
 		std::vector<std::shared_ptr<MemberDescriptor>> members;
 		std::shared_ptr<TypeDescriptor> valueType = nullptr;
 		std::shared_ptr<TypeDescriptor> keyType = nullptr;
+		std::shared_ptr<TypeOps> typeOps = nullptr;
+		std::shared_ptr<VectorOps> vectorOps = nullptr;
 
 		template<typename Type>
 		bool isType() const {
 			int hashT = (int)typeid(Type).hash_code();
 			return hashT == hash;
+		}
+	};
+
+	template<class T, class U, class> struct has_equal_impl : std::false_type {};
+	template<class T, class U> struct has_equal_impl<T, U, decltype((bool)(std::declval<T>() == std::declval<U>()), void())> : std::true_type {};
+	template<class T, class U> struct has_equal : has_equal_impl<T, U, void> {};
+	template <typename T> struct is_vector : std::false_type { };
+	template <typename T, typename Alloc> struct is_vector<std::vector<T, Alloc>> : std::true_type {};
+	template <typename T> struct is_map : std::false_type { };
+	template <typename T, typename V, typename Comp, typename Alloc> struct is_map<std::map<T, V, Comp, Alloc>> : std::true_type {};
+	template <typename T, typename V, typename Comp, typename Alloc> struct is_map<std::unordered_map<T, V, Comp, Alloc>> : std::true_type {};
+
+	template<typename T>
+	class TypeOpsT : public TypeOps {
+	public:
+		void construct(void* ptr) override {
+			new (ptr) T();
+		}
+
+		void destruct(void* ptr) override {
+			((T*)ptr)->~T();
+		}
+
+		void* alloc()override {
+			return new T();
+		}
+
+		void free(void* ptr)override {
+			delete (T*)ptr;
+		}
+
+		bool equals(void* lhs, void* rhs) override {
+			if constexpr (is_vector<T>::value) {
+				if constexpr (has_equal<T, T>()) {
+					if constexpr (has_equal<T::value_type, T::value_type>()) {
+						return *(T*)lhs == *(T*)rhs;
+					}
+				}
+			}
+			else if constexpr (has_equal<T, T>()) {
+				return *(T*)lhs == *(T*)rhs;
+			}
+			return false;
+		}
+
+		bool hasEquals() override {
+			if constexpr (is_vector<T>::value) {
+				if constexpr (has_equal<T, T>()) {
+					if constexpr (has_equal<T::value_type, T::value_type>()) {
+						return true;
+					}
+				}
+			}
+			else if constexpr (has_equal<T, T>()) {
+				return true;
+			}
+			return false;
+		}
+
+		void assign(void* lhs, void* rhs) override {
+			(*(T*)lhs) = (*(T*)rhs);
+		}
+
+		void copy(void* lhs, void* rhs) override {
+			new ((T*)lhs) T(*(T*)rhs);
+		}
+
+		void move(void* lhs, void* rhs) override {
+			copy(lhs, rhs);
+		}
+	};
+
+	template<typename T>
+	class VectorOpsT : public VectorOps {
+	public:
+		typedef std::vector<T> V;
+
+		int size(void* ptr) override {
+			return ((V*)ptr)->size();
+		}
+
+		void clear(void* ptr) override {
+			return ((V*)ptr)->clear();
+		}
+
+		void resize(void* ptr, int size) override {
+			return ((V*)ptr)->resize(size);
+		}
+
+		void insert(void* ptr, int index, void* value) override {
+			if (value) {
+				((V*)ptr)->insert(((V*)ptr)->begin() + index, *(T*)value);
+			}
+			else {
+				((V*)ptr)->insert(((V*)ptr)->begin() + index, T());
+			}
+		}
+
+		void earase(void* ptr, int index) override {
+			((V*)ptr)->erase(((V*)ptr)->begin() + index);
+		}
+
+		void* get(void* ptr, int index) override {
+			return &(*(V*)ptr)[index];
 		}
 	};
 
@@ -102,17 +231,9 @@ namespace baseline {
 		static std::map<std::string, std::shared_ptr<TypeDescriptor>>& getTypesByNameImpl();
 		static void initTypeImpl(std::shared_ptr<TypeDescriptor> type);
 
-		template<class T, class U, class> struct has_equal_impl : std::false_type {};
-		template<class T, class U> struct has_equal_impl<T, U, decltype((bool)(std::declval<T>() == std::declval<U>()), void())> : std::true_type {};
-		template<class T, class U> struct has_equal : has_equal_impl<T, U, void> {};
-		template <typename T> struct is_vector : std::false_type { };
-		template <typename T, typename Alloc> struct is_vector<std::vector<T, Alloc>> : std::true_type {};
-		template <typename T> struct is_map : std::false_type { };
-		template <typename T, typename V, typename Comp, typename Alloc> struct is_map<std::map<T, V, Comp, Alloc>> : std::true_type {};
-		template <typename T, typename V, typename Comp, typename Alloc> struct is_map<std::unordered_map<T, V, Comp, Alloc>> : std::true_type {};
-
 		template<typename Type>
 		static void initType(std::shared_ptr<TypeDescriptor> type) {
+			type->typeOps = std::make_shared<TypeOpsT<Type>>();
 			if constexpr (std::is_pointer_v<Type>) {
 				(int&)type->flags |= (int)TypeDescriptor::Flags::POINTER;
 				type->valueType = getTypeImpl<std::remove_pointer<Type>::type>();
@@ -126,6 +247,7 @@ namespace baseline {
 				if (type->name.empty()) {
 					type->name = "vector<" + type->valueType->name + ">";
 				}
+				type->vectorOps = std::make_shared<VectorOpsT<Type::value_type>>();
 			}
 			if constexpr (is_map<Type>::value) {
 				(int&)type->flags |= (int)TypeDescriptor::Flags::MAP;
@@ -194,8 +316,8 @@ namespace impl {
 #define REG_UNIQUE_IDENTIFIER_IMPL(base, counter, line) REG_UNIQUE_IDENTIFIER_IMPL_2(base, counter, line)
 #define REG_UNIQUE_IDENTIFIER(base) REG_UNIQUE_IDENTIFIER_IMPL(base, __COUNTER__, __LINE__)
 
-#define REG_TYPE(type) static impl::GlobalInitializationCallback REG_UNIQUE_IDENTIFIER(init)([](){ Reflection::registerType<type>(#type); });
-#define REG_MEMBER(type, name) static impl::GlobalInitializationCallback REG_UNIQUE_IDENTIFIER(init)([](){ Reflection::registerMember<type, decltype(type::name)>(#name, offsetof(type, name)); });
+#define REG_TYPE(type) static impl::GlobalInitializationCallback REG_UNIQUE_IDENTIFIER(init)([](){ baseline::Reflection::registerType<type>(#type); });
+#define REG_MEMBER(type, name) static impl::GlobalInitializationCallback REG_UNIQUE_IDENTIFIER(init)([](){ baseline::Reflection::registerMember<type, decltype(type::name)>(#name, offsetof(type, name)); });
 
 #define REG_TYPE_1(type, member1) REG_TYPE(type) REG_MEMBER(type, member1)
 #define REG_TYPE_2(type, member1, member2) REG_TYPE_1(type, member1) REG_MEMBER(type, member2)
