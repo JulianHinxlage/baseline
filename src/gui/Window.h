@@ -5,7 +5,7 @@
 #pragma once
 
 #include <string>
-#include <unordered_map>
+#include <map>
 #include <memory>
 #include <functional>
 #include <glm/glm/glm.hpp>
@@ -15,6 +15,7 @@ namespace baseline {
 	class Window {
 	public:
 		bool alwaysRefresh = false;
+		bool enableLayout = true;
 
 		bool init(int width, int height, const std::string &title, int swapInterval = 1, bool maximized = false);
 		void beginFrame();
@@ -46,10 +47,11 @@ namespace baseline {
 			std::string name = "";
 			std::string menu = "";
 		};
-		std::unordered_map<std::string, std::shared_ptr<SubWindow>> subWindows;
+		std::map<std::string, std::shared_ptr<SubWindow>> subWindows;
 		std::shared_ptr<SubWindow> currentSubWindow;
 		void* context = nullptr;
 		void* imguiContext = nullptr;
+		std::string layoutFile;
 
 		class UpdateCallback {
 		public:

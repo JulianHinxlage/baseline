@@ -10,6 +10,7 @@
 #include <imgui/imgui_internal.h>
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_opengl3.h>
+#include <filesystem>
 
 #if WIN32
 #define GLFW_EXPOSE_NATIVE_WIN32
@@ -68,7 +69,8 @@ namespace baseline {
 			style.WindowRounding = 0.0f;
 			style.Colors[ImGuiCol_WindowBg].w = 1.0f;
 		}
-		io.IniFilename = "layout.ini";
+		layoutFile = std::filesystem::absolute("layout.ini").string();
+		io.IniFilename = layoutFile.c_str();
 
 		if (io.BackendPlatformUserData == nullptr) {
 			ImGui_ImplGlfw_InitForOpenGL((GLFWwindow*)context, true);
@@ -111,9 +113,14 @@ namespace baseline {
 		ImGui_ImplOpenGL3_NewFrame();
 		ImGui_ImplGlfw_NewFrame();
 		ImGui::NewFrame();
-		ImGui::DockSpaceOverViewport();
+		if (enableLayout) {
+			ImGui::DockSpaceOverViewport();
+			updateMenu();
+		}
+		else {
+			ImGui::DockSpaceOverViewport(nullptr, ImGuiDockNodeFlags_NoCloseButton | ImGuiDockNodeFlags_NoWindowMenuButton | ImGuiDockNodeFlags_NoDocking | ImGuiDockNodeFlags_NoSplit | ImGuiDockNodeFlags_NoUndocking | ImGuiDockNodeFlags_NoResize);
+		}
 
-		updateMenu();
 	}
 
 	void Window::endFrame() {
@@ -211,7 +218,12 @@ namespace baseline {
 			if (focus) {
 				ImGui::SetNextWindowFocus();
 			}
-			if (ImGui::Begin(sub->name.c_str(), &sub->open, ImGuiWindowFlags_NoCollapse | flags)) {
+			bool* open = &sub->open;
+			ImGuiWindowFlags flags = ImGuiWindowFlags_NoCollapse;
+			if (!enableLayout) {
+				open = nullptr;
+			}
+			if (ImGui::Begin(sub->name.c_str(), open, flags | flags)) {
 				if (!focusSetup) {
 					sub->visible = true;
 				}

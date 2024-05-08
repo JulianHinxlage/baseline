@@ -91,7 +91,7 @@ namespace baseline {
 		std::unique_lock<std::mutex> lock(mutex);
 
 		DateTime time;
-		time.now();
+		time = DateTime::now();
 
 		for (auto& f : logFiles) {
 			if (level >= f.level) {

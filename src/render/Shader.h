@@ -8,6 +8,7 @@
 #include <glm/glm.hpp>
 #include <unordered_map>
 #include <memory>
+#include <string>
 
 namespace baseline {
 

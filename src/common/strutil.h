@@ -22,10 +22,12 @@ namespace baseline {
 	std::string replace(const std::string& string, const std::string& search, const std::string& replacement);
 
 	int match(const std::string& string1, const std::string& string2);
+	
+	int matchBack(const std::string& string1, const std::string& string2);
 
 	void trimFront(std::string& string, const std::string& prefix, bool trimAllIfNotFound = false);
 
-	void trimBack(std::string& string, const std::string& suffix);
+	void trimBack(std::string& string, const std::string& suffix, bool trimAllIfNotFound = false, bool trimFirst = true);
 
 	std::string subString(const std::string& string, const std::string& prefix, const std::string& suffix);
 

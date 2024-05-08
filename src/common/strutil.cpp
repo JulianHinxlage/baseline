@@ -120,6 +120,24 @@ namespace baseline {
 		return matchCount;
 	}
 
+	int matchBack(const std::string& string1, const std::string& string2) {
+		int matchCount = 0;
+		for (int i = 0; i < string1.size(); i++) {
+			if (i < string2.size()) {
+				if (string1[string1.size() - 1 - i] == string2[string2.size() - 1 - i]) {
+					matchCount++;
+				}
+				else {
+					break;
+				}
+			}
+			else {
+				break;
+			}
+		}
+		return matchCount;
+	}
+
 	void trimFront(std::string& string, const std::string& prefix, bool trimAllIfNotFound) {
 		if (prefix.empty()) {
 			return;
@@ -150,7 +168,7 @@ namespace baseline {
 		}
 	}
 
-	void trimBack(std::string& string, const std::string& suffix) {
+	void trimBack(std::string& string, const std::string& suffix, bool trimAllIfNotFound, bool trimFirst) {
 		if (suffix.empty()) {
 			return;
 		}
@@ -164,7 +182,9 @@ namespace baseline {
 				if (matchIndex == suffix.size()) {
 					matchIndex = 0;
 					trimIndex = i - suffix.size() + 1;
-					break;
+					if (trimFirst) {
+						break;
+					}
 				}
 			}
 			else {
@@ -174,6 +194,9 @@ namespace baseline {
 
 		if (trimIndex != 0) {
 			string = string.substr(0, trimIndex);
+		}
+		else if (trimAllIfNotFound) {
+			string = "";
 		}
 	}
 
