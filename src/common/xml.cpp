@@ -63,6 +63,7 @@ namespace baseline {
 		bool inTag = false;
 		bool inNode = false;
 		bool inQuotes = false;
+		bool inComment = false;
 		int depth = 0;
 		int beginTagIndex = 0;
 		int beginOpenIndex = 0;
@@ -73,6 +74,20 @@ namespace baseline {
 
 		for (int i = 0; i < content.size(); i++) {
 			char c = content[i];
+
+			if (content.substr(i, 4) == "<!--") {
+				inComment = true;
+				i += 3;
+				continue;
+			}
+			if (content.substr(i, 3) == "-->") {
+				inComment = false;
+				i += 2;
+				continue;
+			}
+			if (inComment) {
+				continue;
+			}
 
 			if (!inNode) {
 				if (c == '<') {
