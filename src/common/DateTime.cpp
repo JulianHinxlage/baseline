@@ -220,7 +220,17 @@ namespace baseline {
 	}
 
 	bool DateTime::fromString(const std::string& str) {
-		auto parts = split(str, ".");
+		auto parts = split(str, " ");
+		std::string date = "";
+		if (parts.size() > 0) {
+			date = parts[0];
+		}
+		std::string time = "";
+		if (parts.size() > 1) {
+			time = parts[1];
+		}
+		
+		parts = split(date, ".");
 		if (parts.size() == 3) {
 			day = toInt(parts[0]);
 			month = toInt(parts[1]);
@@ -229,6 +239,17 @@ namespace baseline {
 				year += 2000;
 			}
 			setDate(day, month, year);
+
+
+			parts = split(time, ":");
+			if (parts.size() == 3) {
+				hour = toInt(parts[0]);
+				minute = toInt(parts[1]);
+				second = toInt(parts[2]);
+
+				setTime(hour, minute, second);
+			}
+			return true;
 		}
 		else {
 			return false;
