@@ -242,12 +242,13 @@ namespace baseline {
 				}
 			}
 			if constexpr (is_vector<Type>::value) {
+				using ValueType = typename Type::value_type;
 				(int&)type->flags |= (int)TypeDescriptor::Flags::VECTOR;
-				type->valueType = getTypeImpl<Type::value_type>();
+				type->valueType = getTypeImpl<ValueType>();
 				if (type->name.empty()) {
 					type->name = "vector<" + type->valueType->name + ">";
 				}
-				type->vectorOps = std::make_shared<VectorOpsT<Type::value_type>>();
+				type->vectorOps = std::make_shared<VectorOpsT<ValueType>>();
 			}
 			if constexpr (is_map<Type>::value) {
 				(int&)type->flags |= (int)TypeDescriptor::Flags::MAP;
@@ -290,7 +291,7 @@ namespace baseline {
 
 	void fromString(const TypeDescriptor* desc, void* dest, const std::string& src);
 
-	std::vector<MemberDescriptor> flatMemberList(const TypeDescriptor* desc, const std::string& prefix = "", int offset = 0);
+	std::vector<MemberDescriptor> flatMemberList(const TypeDescriptor* desc, const std::string& prefix = "", int offset = 0, bool fullNames = true);
 
 }
 

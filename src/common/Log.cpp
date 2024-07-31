@@ -100,11 +100,18 @@ namespace baseline {
 				f.stream << "[" << logLevelName(level) << "] ";
 				char buf[102400];
 				try {
-					int i = vsprintf_s(buf, 102400, fmt, args);
-					buf[i] = '\0';
+					int i = _vsprintf_p(buf, 102400, fmt, args);
+					if (i == -1 && i < 102400) {
+						buf[0] = '\0';
+						f.stream << "<output truncated>";
+					}
+					else {
+						buf[i] = '\0';
+					}
 				}
 				catch (...) {
 					buf[0] = '\0';
+					f.stream << "<output truncated>";
 				}
 				f.stream << (const char*)buf << "\n";
 				f.stream.flush();
@@ -118,11 +125,18 @@ namespace baseline {
 			s << "[" << logLevelName(level) << "] ";
 			char buf[102400];
 			try {
-				int i = vsprintf_s(buf, 102400, fmt, args);
-				buf[i] = '\0';
+				int i = _vsprintf_p(buf, 102400, fmt, args);
+				if (i == -1 && i < 102400) {
+					buf[0] = '\0';
+					s << "<output truncated>";
+				}
+				else {
+					buf[i] = '\0';
+				}
 			}
 			catch (...) {
 				buf[0] = '\0';
+				s << "<output truncated>";
 			}
 			s << (const char*)buf << "\n";
 

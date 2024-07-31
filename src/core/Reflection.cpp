@@ -153,11 +153,11 @@ namespace baseline {
 		}
 	}
 
-	std::vector<MemberDescriptor> flatMemberList(const TypeDescriptor* desc, const std::string& prefix, int offset) {
+	std::vector<MemberDescriptor> flatMemberList(const TypeDescriptor* desc, const std::string& prefix, int offset, bool fullNames) {
 		std::vector<MemberDescriptor> list;
 		for (auto& m : desc->members) {
 			if (m->type->members.size() > 0) {
-				auto childs = flatMemberList(m->type.get(), prefix + m->name + "_", offset + m->offset);
+				auto childs = flatMemberList(m->type.get(), fullNames ? (prefix + m->name + "_") : prefix, offset + m->offset, fullNames);
 				for (auto& c : childs) {
 					list.push_back(c);
 				}
